@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "pinyazonelock:block/zonelockcore"
+    }
+  }
+}
