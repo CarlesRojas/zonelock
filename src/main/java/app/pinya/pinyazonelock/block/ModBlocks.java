@@ -1,6 +1,7 @@
 package app.pinya.pinyazonelock.block;
 
 import app.pinya.pinyazonelock.ZoneLock;
+import app.pinya.pinyazonelock.block.custom.ZoneLockCore;
 import app.pinya.pinyazonelock.item.ModItems;
 import java.util.function.Supplier;
 import net.minecraft.world.item.BlockItem;
@@ -21,10 +22,11 @@ public class ModBlocks {
       registerBlock(
           "zonelockcore",
           () ->
-              new Block(
+              new ZoneLockCore(
                   BlockBehaviour.Properties.of()
                       .strength(4f)
-                      .sound(SoundType.AMETHYST))); // TODO change sound
+                      .lightLevel(state -> state.getValue(ZoneLockCore.ACTIVE) ? 10 : 0)
+                      .sound(SoundType.DEEPSLATE_TILES))); // TODO change sound
 
   private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
     RegistryObject<T> toReturn = BLOCKS.register(name, block);
