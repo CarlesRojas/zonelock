@@ -1,7 +1,10 @@
 package app.pinya.pinyazonelock.block.custom;
 
-import app.pinya.pinyazonelock.world.LockedZones;
 import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+
+import app.pinya.pinyazonelock.world.LockedZones;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,7 +14,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import org.jetbrains.annotations.NotNull;
 
 public class ZoneLockCore extends Block {
   public static final BooleanProperty ACTIVE = BooleanProperty.create("active");

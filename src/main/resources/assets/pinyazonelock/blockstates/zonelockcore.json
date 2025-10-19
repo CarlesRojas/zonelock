@@ -1,10 +1,10 @@
 {
-  "variants": {
-    "active=false": {
-      "model": "pinyazonelock:block/zonelockcore_off"
-    },
-    "active=true": {
-      "model": "pinyazonelock:block/zonelockcore_on"
+    "variants": {
+        "active=false": {
+            "model": "pinyazonelock:block/zonelockcore_off"
+        },
+        "active=true": {
+            "model": "pinyazonelock:block/zonelockcore_on"
+        }
     }
-  }
 }

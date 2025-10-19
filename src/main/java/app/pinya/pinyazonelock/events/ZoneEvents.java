@@ -1,5 +1,8 @@
 package app.pinya.pinyazonelock.events;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import app.pinya.pinyazonelock.ZoneLock;
 import app.pinya.pinyazonelock.block.ModBlocks;
 import app.pinya.pinyazonelock.world.LockedZones;
@@ -11,8 +14,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Mod.EventBusSubscriber(modid = ZoneLock.MOD_ID)
 public class ZoneEvents {

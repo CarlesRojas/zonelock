@@ -1,9 +1,10 @@
 package app.pinya.pinyazonelock.block;
 
+import java.util.function.Supplier;
+
 import app.pinya.pinyazonelock.ZoneLock;
 import app.pinya.pinyazonelock.block.custom.ZoneLockCore;
 import app.pinya.pinyazonelock.item.ModItems;
-import java.util.function.Supplier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
