@@ -1,9 +1,17 @@
 package app.pinya.pinyazonelock.block.custom;
 
+import app.pinya.pinyazonelock.world.LockedZones;
+import javax.annotation.Nullable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import org.jetbrains.annotations.NotNull;
 
 public class ZoneLockCore extends Block {
   public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
@@ -17,23 +25,39 @@ public class ZoneLockCore extends Block {
   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
     pBuilder.add(ACTIVE);
   }
-//
-//  @Override
-//  public void setPlacedBy(
-//      Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-//
-//    if (!level.isClientSide) LockedZones.get(level).addAnchor(pos);
-//
-//    super.setPlacedBy(level, pos, state, placer, stack);
-//  }
-//
-//  @Override
-//  public void onRemove(
-//      BlockState oldState, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-//
-//    if (!level.isClientSide && oldState.getBlock() != newState.getBlock())
-//      LockedZones.get(level).removeAnchor(pos);
-//
-//    super.onRemove(oldState, level, pos, newState, isMoving);
-//  }
+
+  @Override
+  public void setPlacedBy(
+      Level level,
+      @NotNull BlockPos pos,
+      @NotNull BlockState state,
+      @Nullable LivingEntity placer,
+      @NotNull ItemStack stack) {
+
+    if (!level.isClientSide && level instanceof ServerLevel sLevel) {
+      LockedZones lockedZones = LockedZones.get(sLevel);
+      lockedZones.addZone(pos, 8, 8, 8, 8, 8, 8);
+
+      // TODO activate zone when a metal block is placed in the UI
+      lockedZones.setActive(pos, true);
+      level.setBlockAndUpdate(pos, state.setValue(ACTIVE, true));
+    }
+
+    super.setPlacedBy(level, pos, state, placer, stack);
+  }
+
+  @Override
+  public void onRemove(
+      @NotNull BlockState oldState,
+      Level level,
+      @NotNull BlockPos pos,
+      @NotNull BlockState newState,
+      boolean isMoving) {
+
+    if (!level.isClientSide
+        && oldState.getBlock() != newState.getBlock()
+        && level instanceof ServerLevel sLevel) LockedZones.get(sLevel).removeZone(pos);
+
+    super.onRemove(oldState, level, pos, newState, isMoving);
+  }
 }

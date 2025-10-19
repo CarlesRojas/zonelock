@@ -1,7 +1,6 @@
 package app.pinya.pinyazonelock.world;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -44,21 +43,21 @@ public class LockedZones extends SavedData {
     return List.copyOf(zones.values());
   }
 
-  public Optional<Zone> getZone(UUID id) {
-    return Optional.ofNullable(zones.get(id));
+  public Optional<Zone> getZone(BlockPos center) {
+    return zones.values().stream().filter(z -> z.center().equals(center)).findFirst();
   }
 
   public List<Zone> getZonesAffecting(BlockPos pos) {
     if (zones.isEmpty()) return List.of();
-    return zones.values().stream().filter(z -> z.contains(pos)).collect(Collectors.toList());
+    return zones.values().stream().filter(Zone::active).filter(z -> z.contains(pos)).toList();
   }
 
   public boolean isPosInAnyZone(BlockPos pos) {
-    for (Zone z : zones.values()) if (z.contains(pos)) return true;
+    for (Zone z : zones.values()) if (z.active() && z.contains(pos)) return true;
     return false;
   }
 
-  public Zone addZone(
+  public void addZone(
       BlockPos center,
       int upExtent,
       int downExtent,
@@ -66,7 +65,8 @@ public class LockedZones extends SavedData {
       int southExtent,
       int eastExtent,
       int westExtent) {
-    Zone z =
+
+    Zone zone =
         new Zone(
             UUID.randomUUID(),
             center.immutable(),
@@ -75,66 +75,77 @@ public class LockedZones extends SavedData {
             northExtent,
             southExtent,
             eastExtent,
-            westExtent);
+            westExtent,
+            false);
 
-    zones.put(z.id(), z);
+    zones.put(zone.id(), zone);
     setDirty();
-    return z;
   }
 
-  public boolean removeZone(UUID id) {
-    Zone removed = zones.remove(id);
-    if (removed != null) {
+  public void removeZone(BlockPos center) {
+    Optional<Zone> foundZone = getZone(center);
+
+    if (foundZone.isPresent()) {
+      Zone zone = foundZone.get();
+      zones.remove(zone.id());
       setDirty();
-      return true;
     }
-    return false;
   }
 
-  public Optional<UUID> removeZoneByCenter(BlockPos center) {
-    UUID found = null;
-
-    for (Zone z : zones.values()) {
-      if (z.center().equals(center)) {
-        found = z.id();
-        break;
-      }
-    }
-
-    if (found != null) {
-      zones.remove(found);
-      setDirty();
-      return Optional.of(found);
-    }
-
-    return Optional.empty();
-  }
-
-  public Optional<Zone> updateZone(
-      UUID id,
-      BlockPos newCenter,
+  public void updateZone(
+      BlockPos center,
       int newUpExtent,
       int newDownExtent,
       int newNorthExtent,
       int newSouthExtent,
       int newEastExtent,
       int newWestExtent) {
-    Zone old = zones.get(id);
-    if (old == null) return Optional.empty();
 
-    Zone updated =
-        new Zone(
-            id,
-            newCenter.immutable(),
-            newUpExtent,
-            newDownExtent,
-            newNorthExtent,
-            newSouthExtent,
-            newEastExtent,
-            newWestExtent);
-    zones.put(id, updated);
-    setDirty();
-    return Optional.of(updated);
+    Optional<Zone> foundZone = getZone(center);
+
+    if (foundZone.isPresent()) {
+      Zone zone = foundZone.get();
+      Zone updated =
+          new Zone(
+              zone.id(),
+              zone.center(),
+              newUpExtent,
+              newDownExtent,
+              newNorthExtent,
+              newSouthExtent,
+              newEastExtent,
+              newWestExtent,
+              zone.active());
+      zones.put(zone.id(), updated);
+
+      setDirty();
+    }
+  }
+
+  public void setActive(BlockPos center, boolean active) {
+
+    Optional<Zone> foundZone = getZone(center);
+
+    if (foundZone.isPresent()) {
+      Zone zone = foundZone.get();
+
+      if (zone.active() != active) {
+        zones.put(
+            zone.id(),
+            new Zone(
+                zone.id(),
+                zone.center(),
+                zone.upExtent(),
+                zone.downExtent(),
+                zone.northExtent(),
+                zone.southExtent(),
+                zone.eastExtent(),
+                zone.westExtent(),
+                active));
+
+        setDirty();
+      }
+    }
   }
 
   @Override
@@ -144,6 +155,8 @@ public class LockedZones extends SavedData {
     ListTag list = new ListTag();
     for (Zone z : zones.values()) list.add(z.saveToTag());
     tag.put("locked_zones", list);
+
+    tag.putInt("version", 1);
 
     return tag;
   }
@@ -156,7 +169,8 @@ public class LockedZones extends SavedData {
       int northExtent,
       int southExtent,
       int eastExtent,
-      int westExtent) {
+      int westExtent,
+      boolean active) {
 
     public Zone(
         UUID id,
@@ -166,7 +180,8 @@ public class LockedZones extends SavedData {
         int northExtent,
         int southExtent,
         int eastExtent,
-        int westExtent) {
+        int westExtent,
+        boolean active) {
 
       if (upExtent < 0
           || downExtent < 0
@@ -185,6 +200,7 @@ public class LockedZones extends SavedData {
       this.southExtent = southExtent;
       this.eastExtent = eastExtent;
       this.westExtent = westExtent;
+      this.active = active;
     }
 
     public static Zone loadFromTag(CompoundTag tag) {
@@ -198,7 +214,9 @@ public class LockedZones extends SavedData {
       int south = tag.getInt("southExtent");
       int east = tag.getInt("eastExtent");
       int west = tag.getInt("westExtent");
-      return new Zone(id, new BlockPos(x, y, z), up, down, north, south, east, west);
+      boolean active = !tag.contains("active") || tag.getBoolean("active");
+
+      return new Zone(id, new BlockPos(x, y, z), up, down, north, south, east, west, active);
     }
 
     public boolean contains(BlockPos pos) {
@@ -226,30 +244,8 @@ public class LockedZones extends SavedData {
       tag.putInt("southExtent", southExtent);
       tag.putInt("eastExtent", eastExtent);
       tag.putInt("westExtent", westExtent);
+      tag.putBoolean("active", active);
       return tag;
     }
-
-    //    @Override
-    //    public @NotNull String toString() {
-    //      return String.format(
-    //          "Zone{id=%s, center=%s, extents=[u=%d,d=%d,n=%d,s=%d,e=%d,w=%d]}",
-    //          id, center, upExtent, downExtent, northExtent, southExtent, eastExtent, westExtent);
-    //    }
-    //
-    //    @Override
-    //    public boolean equals(Object o) {
-    //      if (this == o) return true;
-    //      if (!(o instanceof Zone)) return false;
-    //
-    //      Zone zone = (Zone) o;
-    //      return upExtent == zone.upExtent
-    //          && downExtent == zone.downExtent
-    //          && northExtent == zone.northExtent
-    //          && southExtent == zone.southExtent
-    //          && eastExtent == zone.eastExtent
-    //          && westExtent == zone.westExtent
-    //          && id.equals(zone.id)
-    //          && center.equals(zone.center);
-    //    }
   }
 }
