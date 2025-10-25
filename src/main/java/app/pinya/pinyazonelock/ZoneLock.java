@@ -2,7 +2,6 @@ package app.pinya.pinyazonelock;
 
 import app.pinya.pinyazonelock.block.ModBlocks;
 import app.pinya.pinyazonelock.item.ModItems;
-import com.mojang.logging.LogUtils;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,13 +15,11 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.slf4j.Logger;
 
 @Mod(ZoneLock.MOD_ID)
 public class ZoneLock {
 
   public static final String MOD_ID = "pinyazonelock";
-  private static final Logger LOGGER = LogUtils.getLogger();
 
   public ZoneLock() {
     IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -38,7 +35,8 @@ public class ZoneLock {
     ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
   }
 
-  private void commonSetup(final FMLCommonSetupEvent event) {}
+  private void commonSetup(final FMLCommonSetupEvent event) {
+  }
 
   private void addCreative(BuildCreativeModeTabContentsEvent event) {
     if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
@@ -47,11 +45,13 @@ public class ZoneLock {
   }
 
   @SubscribeEvent
-  public void onServerStarting(ServerStartingEvent event) {}
+  public void onServerStarting(ServerStartingEvent event) {
+  }
 
   @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
   public static class ClientModEvents {
     @SubscribeEvent
-    public static void onClientSetup(FMLClientSetupEvent event) {}
+    public static void onClientSetup(FMLClientSetupEvent event) {
+    }
   }
 }

@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
+import app.pinya.pinyazonelock.networking.ZoneBroadcaster;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -23,7 +24,8 @@ public class LockedZones extends SavedData {
 
   private final Map<UUID, Zone> zones = new LinkedHashMap<>();
 
-  public LockedZones() {}
+  public LockedZones() {
+  }
 
   public static LockedZones create(CompoundTag tag, HolderLookup.Provider lookup) {
     LockedZones data = new LockedZones();
@@ -55,16 +57,20 @@ public class LockedZones extends SavedData {
   }
 
   public List<Zone> getZonesAffecting(BlockPos pos) {
-    if (zones.isEmpty()) return List.of();
+    if (zones.isEmpty())
+      return List.of();
     return zones.values().stream().filter(Zone::active).filter(z -> z.contains(pos)).toList();
   }
 
   public boolean isPosInAnyZone(BlockPos pos) {
-    for (Zone z : zones.values()) if (z.active() && z.contains(pos)) return true;
+    for (Zone z : zones.values())
+      if (z.active() && z.contains(pos))
+        return true;
     return false;
   }
 
   public void addZone(
+      ServerLevel serverLevel,
       BlockPos center,
       int upExtent,
       int downExtent,
@@ -73,33 +79,36 @@ public class LockedZones extends SavedData {
       int eastExtent,
       int westExtent) {
 
-    Zone zone =
-        new Zone(
-            UUID.randomUUID(),
-            center.immutable(),
-            upExtent,
-            downExtent,
-            northExtent,
-            southExtent,
-            eastExtent,
-            westExtent,
-            false);
+    Zone zone = new Zone(
+        UUID.randomUUID(),
+        center.immutable(),
+        upExtent,
+        downExtent,
+        northExtent,
+        southExtent,
+        eastExtent,
+        westExtent,
+        false);
 
     zones.put(zone.id(), zone);
     setDirty();
+    ZoneBroadcaster.sendUpsert(serverLevel, zone);
   }
 
-  public void removeZone(BlockPos center) {
+  public void removeZone(
+      ServerLevel serverLevel, BlockPos center) {
     Optional<Zone> foundZone = getZone(center);
 
     if (foundZone.isPresent()) {
       Zone zone = foundZone.get();
       zones.remove(zone.id());
       setDirty();
+      ZoneBroadcaster.sendRemove(serverLevel, zone.id());
     }
   }
 
   public void updateZone(
+      ServerLevel serverLevel,
       BlockPos center,
       int newUpExtent,
       int newDownExtent,
@@ -112,24 +121,23 @@ public class LockedZones extends SavedData {
 
     if (foundZone.isPresent()) {
       Zone zone = foundZone.get();
-      Zone updated =
-          new Zone(
-              zone.id(),
-              zone.center(),
-              newUpExtent,
-              newDownExtent,
-              newNorthExtent,
-              newSouthExtent,
-              newEastExtent,
-              newWestExtent,
-              zone.active());
+      Zone updated = new Zone(
+          zone.id(),
+          zone.center(),
+          newUpExtent,
+          newDownExtent,
+          newNorthExtent,
+          newSouthExtent,
+          newEastExtent,
+          newWestExtent,
+          zone.active());
       zones.put(zone.id(), updated);
-
       setDirty();
+      ZoneBroadcaster.sendUpsert(serverLevel, updated);
     }
   }
 
-  public void setActive(BlockPos center, boolean active) {
+  public void setActive(ServerLevel serverLevel, BlockPos center, boolean active) {
 
     Optional<Zone> foundZone = getZone(center);
 
@@ -137,20 +145,21 @@ public class LockedZones extends SavedData {
       Zone zone = foundZone.get();
 
       if (zone.active() != active) {
-        zones.put(
+        Zone updatedZone = new Zone(
             zone.id(),
-            new Zone(
-                zone.id(),
-                zone.center(),
-                zone.upExtent(),
-                zone.downExtent(),
-                zone.northExtent(),
-                zone.southExtent(),
-                zone.eastExtent(),
-                zone.westExtent(),
-                active));
+            zone.center(),
+            zone.upExtent(),
+            zone.downExtent(),
+            zone.northExtent(),
+            zone.southExtent(),
+            zone.eastExtent(),
+            zone.westExtent(),
+            active);
+
+        zones.put(zone.id(), updatedZone);
 
         setDirty();
+        ZoneBroadcaster.sendUpsert(serverLevel, updatedZone);
       }
     }
   }
@@ -160,7 +169,8 @@ public class LockedZones extends SavedData {
       @NotNull CompoundTag tag, HolderLookup.@NotNull Provider lookup) {
 
     ListTag list = new ListTag();
-    for (Zone z : zones.values()) list.add(z.saveToTag());
+    for (Zone z : zones.values())
+      list.add(z.saveToTag());
     tag.put("locked_zones", list);
 
     tag.putInt("version", 1);
