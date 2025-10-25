@@ -2,6 +2,7 @@ package app.pinya.pinyazonelock;
 
 import app.pinya.pinyazonelock.block.ModBlocks;
 import app.pinya.pinyazonelock.item.ModItems;
+import app.pinya.pinyazonelock.networking.ModMessages;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,6 +37,9 @@ public class ZoneLock {
   }
 
   private void commonSetup(final FMLCommonSetupEvent event) {
+    event.enqueueWork(() -> {
+      ModMessages.register();
+    });
   }
 
   private void addCreative(BuildCreativeModeTabContentsEvent event) {

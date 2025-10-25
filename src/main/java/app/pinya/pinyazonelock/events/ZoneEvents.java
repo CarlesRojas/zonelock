@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -75,15 +76,15 @@ public class ZoneEvents {
       return;
 
     BlockPos targetPos = event.getPos().relative(event.getFace());
-    if (ClientLockedZones.isPosInAnyZone(targetPos)) {
+
+    if (ClientLockedZones.getInstance().isPosInAnyZone(targetPos)) {
+      LOGGER.info("Zone Locked from client");
       event.setCanceled(true);
       event.setCancellationResult(InteractionResult.FAIL);
 
-      // Optional: tiny UX touch
       Minecraft.getInstance().player.displayClientMessage(
           Component.translatable("msg.pinya.zonelock.blocked_place"), true);
-      // Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK, 0.6f,
-      // 0.6f);
+      Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.6f, 0.6f);
     }
   }
 }

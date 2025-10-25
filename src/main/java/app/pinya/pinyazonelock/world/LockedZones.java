@@ -9,7 +9,8 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
-import app.pinya.pinyazonelock.networking.ZoneBroadcaster;
+import app.pinya.pinyazonelock.networking.ModMessages;
+import app.pinya.pinyazonelock.networking.ZoneDataSyncS2CPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -70,7 +71,6 @@ public class LockedZones extends SavedData {
   }
 
   public void addZone(
-      ServerLevel serverLevel,
       BlockPos center,
       int upExtent,
       int downExtent,
@@ -92,23 +92,22 @@ public class LockedZones extends SavedData {
 
     zones.put(zone.id(), zone);
     setDirty();
-    ZoneBroadcaster.sendUpsert(serverLevel, zone);
+    syncToClients();
   }
 
   public void removeZone(
-      ServerLevel serverLevel, BlockPos center) {
+      BlockPos center) {
     Optional<Zone> foundZone = getZone(center);
 
     if (foundZone.isPresent()) {
       Zone zone = foundZone.get();
       zones.remove(zone.id());
       setDirty();
-      ZoneBroadcaster.sendRemove(serverLevel, zone.id());
+      syncToClients();
     }
   }
 
   public void updateZone(
-      ServerLevel serverLevel,
       BlockPos center,
       int newUpExtent,
       int newDownExtent,
@@ -133,11 +132,10 @@ public class LockedZones extends SavedData {
           zone.active());
       zones.put(zone.id(), updated);
       setDirty();
-      ZoneBroadcaster.sendUpsert(serverLevel, updated);
     }
   }
 
-  public void setActive(ServerLevel serverLevel, BlockPos center, boolean active) {
+  public void setActive(BlockPos center, boolean active) {
 
     Optional<Zone> foundZone = getZone(center);
 
@@ -159,9 +157,19 @@ public class LockedZones extends SavedData {
         zones.put(zone.id(), updatedZone);
 
         setDirty();
-        ZoneBroadcaster.sendUpsert(serverLevel, updatedZone);
+        syncToClients();
       }
     }
+  }
+
+  private void syncToClients() {
+    CompoundTag tag = new CompoundTag();
+    ListTag list = new ListTag();
+    for (Zone z : zones.values())
+      list.add(z.saveToTag());
+    tag.put("locked_zones", list);
+
+    ModMessages.sendToAllPlayers(new ZoneDataSyncS2CPacket(tag));
   }
 
   @Override
