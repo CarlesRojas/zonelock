@@ -8,7 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import app.pinya.pinyazonelock.events.ZoneEvents;
 import app.pinya.pinyazonelock.networking.ModMessages;
 import app.pinya.pinyazonelock.networking.ZoneDataSyncS2CPacket;
 import net.minecraft.core.BlockPos;
@@ -22,6 +25,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 
 public class LockedZones extends SavedData {
   private static final String DATA_NAME = "pinya_locked_zones";
+  private static final Logger LOGGER = LoggerFactory.getLogger(ZoneEvents.class);
 
   private final Map<UUID, Zone> zones = new LinkedHashMap<>();
 
@@ -64,9 +68,12 @@ public class LockedZones extends SavedData {
   }
 
   public boolean isPosInAnyZone(BlockPos pos) {
-    for (Zone z : zones.values())
+    LOGGER.debug("---------------------- ZONES ----------------------");
+    for (Zone z : zones.values()) {
+      LOGGER.debug("Zone center {}: {}", z.center(), z.contains(pos));
       if (z.active() && z.contains(pos))
         return true;
+    }
     return false;
   }
 
