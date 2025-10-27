@@ -51,14 +51,11 @@ public class ClientLockedZones {
     }
 
     public boolean isPosInAnyZone(BlockPos pos) {
-        LOGGER.info("Checking if pos {} is in any zone", pos);
         for (LockedZones.Zone z : zones.values()) {
-            LOGGER.info("Checking zone {} (Active: {})", z, z.active());
-            if (z.active() && z.contains(pos)) {
-                LOGGER.info("Pos {} is in zone {}", pos, z.id());
+            if (z.active() && z.contains(pos))
                 return true;
-            }
         }
+
         return false;
     }
 }
