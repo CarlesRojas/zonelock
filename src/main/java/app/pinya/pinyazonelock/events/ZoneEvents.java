@@ -11,10 +11,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,6 +27,15 @@ public class ZoneEvents {
   private static final Logger LOGGER = LoggerFactory.getLogger(ZoneEvents.class);
 
   private ZoneEvents() {
+  }
+
+  @SubscribeEvent
+  public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+    if (event.getEntity() instanceof ServerPlayer player) {
+      ServerLevel level = player.serverLevel();
+      LockedZones zones = LockedZones.get(level);
+      zones.syncToClients();
+    }
   }
 
   @SubscribeEvent
@@ -56,7 +67,7 @@ public class ZoneEvents {
       return;
 
     if (event.getLevel() instanceof ServerLevel serverLevel)
-      onRightClickBlockServer(event, (ServerLevel) serverLevel);
+      onRightClickBlockServer(event, serverLevel);
     else
       onRightClickBlockClient(event);
   }

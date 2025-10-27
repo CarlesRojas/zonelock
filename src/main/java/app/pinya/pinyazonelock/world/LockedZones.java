@@ -162,7 +162,7 @@ public class LockedZones extends SavedData {
     }
   }
 
-  private void syncToClients() {
+  public void syncToClients() {
     CompoundTag tag = new CompoundTag();
     ListTag list = new ListTag();
     for (Zone z : zones.values())
