@@ -29,6 +29,10 @@ public class ZoneEvents {
 
   @SubscribeEvent
   public static void onAnyBreak(BlockEvent.BreakEvent event) {
+    Player player = event.getPlayer();
+    if (player.isCreative())
+      return;
+
     if (!(event.getLevel() instanceof ServerLevel level))
       return;
 
@@ -38,9 +42,6 @@ public class ZoneEvents {
       return;
 
     BlockPos pos = event.getPos();
-    Player player = event.getPlayer();
-    if (player.isCreative())
-      return;
 
     if (LockedZones.get(level).isPosInAnyZone(pos)) {
       event.setCanceled(true);
