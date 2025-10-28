@@ -5,7 +5,7 @@ import app.pinya.pinyazonelock.block.entity.ModBlocksEntities;
 import app.pinya.pinyazonelock.item.ModItems;
 import app.pinya.pinyazonelock.networking.ModMessages;
 import app.pinya.pinyazonelock.screen.ModMenuTypes;
-import app.pinya.pinyazonelock.screen.custom.ZoneLockCoreScreen;
+import app.pinya.pinyazonelock.screen.custom.CoreScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
@@ -62,7 +62,7 @@ public class ZoneLock {
   public static class ClientModEvents {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-      MenuScreens.register(ModMenuTypes.ZONE_LOCK_CORE_MENU.get(), ZoneLockCoreScreen::new);
+      MenuScreens.register(ModMenuTypes.ZONE_LOCK_CORE_MENU.get(), CoreScreen::new);
     }
   }
 }

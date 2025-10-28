@@ -14,15 +14,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.SlotItemHandler;
 
-public class ZoneLockCoreMenu extends AbstractContainerMenu {
+public class CoreMenu extends AbstractContainerMenu {
     public final CoreEntity blockEntity;
     private final Level level;
 
-    public ZoneLockCoreMenu(int contianerId, Inventory inv, FriendlyByteBuf extraData) {
+    public CoreMenu(int contianerId, Inventory inv, FriendlyByteBuf extraData) {
         this(contianerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
     }
 
-    public ZoneLockCoreMenu(int contianerId, Inventory inv, BlockEntity blockEntity) {
+    public CoreMenu(int contianerId, Inventory inv, BlockEntity blockEntity) {
         super(ModMenuTypes.ZONE_LOCK_CORE_MENU.get(), contianerId);
         this.blockEntity = (CoreEntity) blockEntity;
         this.level = inv.player.level();

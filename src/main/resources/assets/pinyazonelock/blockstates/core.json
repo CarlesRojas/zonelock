@@ -1,0 +1,10 @@
+{
+    "variants": {
+        "active=false": {
+            "model": "pinyazonelock:block/core_off"
+        },
+        "active=true": {
+            "model": "pinyazonelock:block/core_on"
+        }
+    }
+}

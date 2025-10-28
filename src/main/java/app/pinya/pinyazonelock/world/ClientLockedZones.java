@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -17,7 +14,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientLockedZones {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientLockedZones.class);
     private static ClientLockedZones INSTANCE;
     private final Map<UUID, LockedZones.Zone> zones = new LinkedHashMap<>();
 

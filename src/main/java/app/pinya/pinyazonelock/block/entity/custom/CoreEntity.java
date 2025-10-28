@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import app.pinya.pinyazonelock.block.custom.Core;
 import app.pinya.pinyazonelock.block.entity.ModBlocksEntities;
-import app.pinya.pinyazonelock.screen.custom.ZoneLockCoreMenu;
+import app.pinya.pinyazonelock.screen.custom.CoreMenu;
 import app.pinya.pinyazonelock.world.LockedZones;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -74,7 +74,7 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
-        return new ZoneLockCoreMenu(pContainerId, pPlayerInventory, this);
+        return new CoreMenu(pContainerId, pPlayerInventory, this);
     }
 
     @Override

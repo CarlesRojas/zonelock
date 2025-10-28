@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-public class ZoneLockCoreScreen extends AbstractContainerScreen<ZoneLockCoreMenu> {
+public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(ZoneLock.MOD_ID,
             "textures/gui/core.png");
 
@@ -20,7 +20,7 @@ public class ZoneLockCoreScreen extends AbstractContainerScreen<ZoneLockCoreMenu
 
     private boolean lastActiveState;
 
-    public ZoneLockCoreScreen(ZoneLockCoreMenu menu, Inventory playerInventory, Component title) {
+    public CoreScreen(CoreMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageHeight = 247;
         this.inventoryLabelY = this.imageHeight - 94;

@@ -1,6 +1,6 @@
 {
     "parent": "minecraft:block/cube_all",
     "textures": {
-        "all": "pinyazonelock:block/zonelockcore_off"
+        "all": "pinyazonelock:block/core_on"
     }
 }
