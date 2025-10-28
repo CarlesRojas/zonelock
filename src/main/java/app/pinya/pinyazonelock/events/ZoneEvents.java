@@ -66,6 +66,8 @@ public class ZoneEvents {
     if (player.isCreative())
       return;
 
+    // BUG when you right click to place an item in the block, this blocks it
+
     if (event.getLevel() instanceof ServerLevel serverLevel)
       onRightClickBlockServer(event, serverLevel);
     else

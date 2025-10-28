@@ -16,18 +16,15 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public class ModBlocks {
-  public static final DeferredRegister<Block> BLOCKS =
-      DeferredRegister.create(ForgeRegistries.BLOCKS, ZoneLock.MOD_ID);
+  public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ZoneLock.MOD_ID);
 
-  public static final RegistryObject<Block> ZONE_LOCK_CORE =
-      registerBlock(
-          "zonelockcore",
-          () ->
-              new ZoneLockCore(
-                  BlockBehaviour.Properties.of()
-                      .strength(4f)
-                      .lightLevel(state -> state.getValue(ZoneLockCore.ACTIVE) ? 10 : 0)
-                      .sound(SoundType.DEEPSLATE_TILES))); // TODO change sound
+  public static final RegistryObject<Block> ZONE_LOCK_CORE = registerBlock(
+      "zonelockcore",
+      () -> new ZoneLockCore(
+          BlockBehaviour.Properties.of()
+              .strength(4f)
+              .lightLevel(state -> state.getValue(ZoneLockCore.ACTIVE) ? 10 : 0)
+              .sound(SoundType.DEEPSLATE_TILES))); // TODO change sound
 
   private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
     RegistryObject<T> toReturn = BLOCKS.register(name, block);

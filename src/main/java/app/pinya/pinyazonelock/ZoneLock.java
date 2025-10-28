@@ -1,6 +1,7 @@
 package app.pinya.pinyazonelock;
 
 import app.pinya.pinyazonelock.block.ModBlocks;
+import app.pinya.pinyazonelock.block.entity.ModBlocksEntities;
 import app.pinya.pinyazonelock.item.ModItems;
 import app.pinya.pinyazonelock.networking.ModMessages;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -31,6 +32,7 @@ public class ZoneLock {
 
     ModItems.register(modEventBus);
     ModBlocks.register(modEventBus);
+    ModBlocksEntities.register(modEventBus);
 
     modEventBus.addListener(this::addCreative);
     ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
