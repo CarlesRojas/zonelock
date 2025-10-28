@@ -1,8 +1,8 @@
 package app.pinya.pinyazonelock.block.custom;
 
-import javax.annotation.Nullable;
-
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mojang.serialization.MapCodec;
 
@@ -15,7 +15,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -29,6 +28,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class Core extends BaseEntityBlock {
+  private static final Logger LOGGER = LoggerFactory.getLogger(Core.class);
   public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
   public static final MapCodec<Core> CODEC = simpleCodec(Core::new);
 
@@ -42,27 +42,29 @@ public class Core extends BaseEntityBlock {
     pBuilder.add(ACTIVE);
   }
 
-  @Override
-  public void setPlacedBy(
-      Level level,
-      @NotNull BlockPos pos,
-      @NotNull BlockState state,
-      @Nullable LivingEntity placer,
-      @NotNull ItemStack stack) {
+  // @Override
+  // public void setPlacedBy(
+  // Level level,
+  // @NotNull BlockPos pos,
+  // @NotNull BlockState state,
+  // @Nullable LivingEntity placer,
+  // @NotNull ItemStack stack) {
 
-    if (!level.isClientSide && level instanceof ServerLevel sLevel) {
-      LockedZones lockedZones = LockedZones.get(sLevel);
-      lockedZones.addZone(pos, 8, 8, 8, 8, 8, 8);
+  // LOGGER.info("Core block created at {}", pos);
 
-      boolean hasItem = level.getBlockEntity(pos) instanceof CoreEntity coreEntity
-          && !coreEntity.inventory.getStackInSlot(0).isEmpty();
+  // if (!level.isClientSide && level instanceof ServerLevel sLevel) {
+  // LockedZones lockedZones = LockedZones.get(sLevel);
+  // lockedZones.addZone(pos, 8, 8, 8, 8, 8, 8);
 
-      lockedZones.setActive(pos, hasItem);
-      level.setBlockAndUpdate(pos, state.setValue(ACTIVE, hasItem));
-    }
+  // boolean hasItem = level.getBlockEntity(pos) instanceof CoreEntity coreEntity
+  // && !coreEntity.inventory.getStackInSlot(0).isEmpty();
 
-    super.setPlacedBy(level, pos, state, placer, stack);
-  }
+  // lockedZones.setActive(pos, hasItem);
+  // level.setBlockAndUpdate(pos, state.setValue(ACTIVE, hasItem));
+  // }
+
+  // super.setPlacedBy(level, pos, state, placer, stack);
+  // }
 
   @Override
   public void onRemove(
@@ -92,7 +94,7 @@ public class Core extends BaseEntityBlock {
       BlockHitResult pHitResult) {
 
     if (pLevel.getBlockEntity(pPos) instanceof CoreEntity entity) {
-      if (!pLevel.isClientSide()) {
+      if (!pLevel.isClientSide) {
         ((ServerPlayer) pPlayer)
             .openMenu(new SimpleMenuProvider(entity, Component.translatable("block.pinyazonelock.core")), pPos);
       }

@@ -1,1 +1,4 @@
-// 1.21	2025-10-28T16:14:29.8630294	Registries
+// 1.21	2025-10-28T17:33:28.5726968	Registries
+4a8d7d30b296006b28ecc6fcc0f3b9571e40d93b data/pinyazonelock/forge/biome_modifier/add_core.json
+8950ff3ae1a073f4208a06a7ca3545ba0def9fa4 data/pinyazonelock/worldgen/configured_feature/core.json
+10f35d426c81df9f092996c1d924b8979882e540 data/pinyazonelock/worldgen/placed_feature/core_placed.json

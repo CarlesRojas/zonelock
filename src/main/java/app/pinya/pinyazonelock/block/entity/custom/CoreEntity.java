@@ -2,6 +2,9 @@ package app.pinya.pinyazonelock.block.entity.custom;
 
 import javax.annotation.Nullable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import app.pinya.pinyazonelock.block.custom.Core;
 import app.pinya.pinyazonelock.block.entity.ModBlocksEntities;
 import app.pinya.pinyazonelock.screen.custom.CoreMenu;
@@ -27,6 +30,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
 
 public class CoreEntity extends BlockEntity implements MenuProvider {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Core.class);
+    private boolean initialized = false;
 
     public final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
@@ -85,15 +90,48 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
     // BlockEntity
 
     @Override
+    public void onLoad() {
+        if (!level.isClientSide)
+            initialize();
+
+    }
+
+    public void initialize() {
+        if (initialized)
+            return;
+
+        initialized = true;
+        setChanged();
+
+        LOGGER.info("Core block created at {}", getBlockPos());
+
+        if (!level.isClientSide && level instanceof ServerLevel sLevel) {
+            BlockPos zonePos = getBlockPos();
+            BlockState state = getBlockState();
+
+            LockedZones lockedZones = LockedZones.get(sLevel);
+            lockedZones.addZone(zonePos, 8, 8, 8, 8, 8, 8);
+
+            boolean hasItem = level.getBlockEntity(zonePos) instanceof CoreEntity coreEntity
+                    && !coreEntity.inventory.getStackInSlot(0).isEmpty();
+
+            lockedZones.setActive(zonePos, hasItem);
+            level.setBlockAndUpdate(zonePos, state.setValue(Core.ACTIVE, hasItem));
+        }
+    }
+
+    @Override
     protected void saveAdditional(CompoundTag pTag, Provider pRegistries) {
         super.saveAdditional(pTag, pRegistries);
         pTag.put("inventory", inventory.serializeNBT(pRegistries));
+        pTag.putBoolean("initialized", initialized);
     }
 
     @Override
     protected void loadAdditional(CompoundTag pTag, Provider pRegistries) {
         super.loadAdditional(pTag, pRegistries);
         inventory.deserializeNBT(pRegistries, pTag.getCompound("inventory"));
+        initialized = pTag.getBoolean("initialized");
     }
 
     @Nullable
