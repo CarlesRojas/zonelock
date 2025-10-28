@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -65,6 +66,14 @@ public class ZoneEvents {
       event.setCanceled(true);
       showFeedback();
     }
+  }
+
+  @SubscribeEvent
+  public static void onExplosionDetonate(ExplosionEvent.Detonate event) {
+    if (!(event.getLevel() instanceof ServerLevel level))
+      return;
+
+    event.getAffectedBlocks().removeIf((BlockPos pos) -> LockedZones.get(level).isPosInAnyZone(pos));
   }
 
   private static boolean isPlacementItem(Item item) {
