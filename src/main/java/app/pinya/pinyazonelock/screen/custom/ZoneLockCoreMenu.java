@@ -1,7 +1,7 @@
 package app.pinya.pinyazonelock.screen.custom;
 
 import app.pinya.pinyazonelock.block.ModBlocks;
-import app.pinya.pinyazonelock.block.entity.custom.ZoneLockCoreEntity;
+import app.pinya.pinyazonelock.block.entity.custom.CoreEntity;
 import app.pinya.pinyazonelock.screen.ModMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.SlotItemHandler;
 
 public class ZoneLockCoreMenu extends AbstractContainerMenu {
-    public final ZoneLockCoreEntity blockEntity;
+    public final CoreEntity blockEntity;
     private final Level level;
 
     public ZoneLockCoreMenu(int contianerId, Inventory inv, FriendlyByteBuf extraData) {
@@ -24,7 +24,7 @@ public class ZoneLockCoreMenu extends AbstractContainerMenu {
 
     public ZoneLockCoreMenu(int contianerId, Inventory inv, BlockEntity blockEntity) {
         super(ModMenuTypes.ZONE_LOCK_CORE_MENU.get(), contianerId);
-        this.blockEntity = (ZoneLockCoreEntity) blockEntity;
+        this.blockEntity = (CoreEntity) blockEntity;
         this.level = inv.player.level();
 
         addPlayerInventory(inv);

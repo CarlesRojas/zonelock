@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class ZoneLockCoreEntity extends BlockEntity implements MenuProvider {
+public class CoreEntity extends BlockEntity implements MenuProvider {
 
     public final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
@@ -53,7 +53,7 @@ public class ZoneLockCoreEntity extends BlockEntity implements MenuProvider {
         }
     };
 
-    public ZoneLockCoreEntity(BlockPos pPos, BlockState pBlockState) {
+    public CoreEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlocksEntities.ZONE_LOCK_CORE_ENTITY.get(), pPos, pBlockState);
     }
 

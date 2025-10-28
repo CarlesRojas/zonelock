@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.mojang.serialization.MapCodec;
 
-import app.pinya.pinyazonelock.block.entity.custom.ZoneLockCoreEntity;
+import app.pinya.pinyazonelock.block.entity.custom.CoreEntity;
 import app.pinya.pinyazonelock.world.LockedZones;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -75,8 +75,8 @@ public class Core extends BaseEntityBlock {
       LockedZones.get(sLevel).removeZone(pos);
 
     if (oldState.getBlock() != newState.getBlock()
-        && level.getBlockEntity(pos) instanceof ZoneLockCoreEntity zonelockCoreEntity) {
-      zonelockCoreEntity.dropContents();
+        && level.getBlockEntity(pos) instanceof CoreEntity coreEntity) {
+      coreEntity.dropContents();
       level.updateNeighbourForOutputSignal(pos, this);
     }
 
@@ -88,7 +88,7 @@ public class Core extends BaseEntityBlock {
       ItemStack pStack, BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand,
       BlockHitResult pHitResult) {
 
-    if (pLevel.getBlockEntity(pPos) instanceof ZoneLockCoreEntity entity) {
+    if (pLevel.getBlockEntity(pPos) instanceof CoreEntity entity) {
       if (!pLevel.isClientSide()) {
         ((ServerPlayer) pPlayer)
             .openMenu(new SimpleMenuProvider(entity, Component.translatable("block.pinyazonelock.core")), pPos);
@@ -100,7 +100,7 @@ public class Core extends BaseEntityBlock {
 
   @Override
   public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-    return new ZoneLockCoreEntity(pPos, pState);
+    return new CoreEntity(pPos, pState);
   }
 
   @Override
