@@ -33,6 +33,14 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(Core.class);
     private boolean initialized = false;
 
+    // Zone dimensions
+    private int northBlocks = 8;
+    private int southBlocks = 8;
+    private int eastBlocks = 8;
+    private int westBlocks = 8;
+    private int upBlocks = 8;
+    private int downBlocks = 8;
+
     public final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
         protected int getStackLimit(int slot, ItemStack stack) {
@@ -93,7 +101,6 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
     public void onLoad() {
         if (!level.isClientSide)
             initialize();
-
     }
 
     public void initialize() {
@@ -103,14 +110,12 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
         initialized = true;
         setChanged();
 
-        LOGGER.info("Core block created at {}", getBlockPos());
-
         if (!level.isClientSide && level instanceof ServerLevel sLevel) {
             BlockPos zonePos = getBlockPos();
             BlockState state = getBlockState();
 
             LockedZones lockedZones = LockedZones.get(sLevel);
-            lockedZones.addZone(zonePos, 8, 8, 8, 8, 8, 8);
+            lockedZones.addZone(zonePos, upBlocks, downBlocks, northBlocks, southBlocks, eastBlocks, westBlocks);
 
             boolean hasItem = level.getBlockEntity(zonePos) instanceof CoreEntity coreEntity
                     && !coreEntity.inventory.getStackInSlot(0).isEmpty();
@@ -125,6 +130,13 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
         super.saveAdditional(pTag, pRegistries);
         pTag.put("inventory", inventory.serializeNBT(pRegistries));
         pTag.putBoolean("initialized", initialized);
+
+        pTag.putInt("northBlocks", northBlocks);
+        pTag.putInt("southBlocks", southBlocks);
+        pTag.putInt("eastBlocks", eastBlocks);
+        pTag.putInt("westBlocks", westBlocks);
+        pTag.putInt("upBlocks", upBlocks);
+        pTag.putInt("downBlocks", downBlocks);
     }
 
     @Override
@@ -132,6 +144,27 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
         super.loadAdditional(pTag, pRegistries);
         inventory.deserializeNBT(pRegistries, pTag.getCompound("inventory"));
         initialized = pTag.getBoolean("initialized");
+
+        northBlocks = pTag.getInt("northBlocks");
+        southBlocks = pTag.getInt("southBlocks");
+        eastBlocks = pTag.getInt("eastBlocks");
+        westBlocks = pTag.getInt("westBlocks");
+        upBlocks = pTag.getInt("upBlocks");
+        downBlocks = pTag.getInt("downBlocks");
+    }
+
+    public void setZoneDimensions(int up, int down, int north, int south, int east, int west) {
+        upBlocks = up;
+        downBlocks = down;
+        northBlocks = north;
+        southBlocks = south;
+        eastBlocks = east;
+        westBlocks = west;
+
+        if (!level.isClientSide && level instanceof ServerLevel sLevel)
+            LockedZones.get(sLevel).updateZone(worldPosition, up, down, north, south, east, west);
+
+        setChanged();
     }
 
     @Nullable

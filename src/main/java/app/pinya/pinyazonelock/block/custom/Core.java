@@ -1,8 +1,6 @@
 package app.pinya.pinyazonelock.block.custom;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.mojang.serialization.MapCodec;
 
@@ -28,7 +26,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class Core extends BaseEntityBlock {
-  private static final Logger LOGGER = LoggerFactory.getLogger(Core.class);
   public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
   public static final MapCodec<Core> CODEC = simpleCodec(Core::new);
 
@@ -41,30 +38,6 @@ public class Core extends BaseEntityBlock {
   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
     pBuilder.add(ACTIVE);
   }
-
-  // @Override
-  // public void setPlacedBy(
-  // Level level,
-  // @NotNull BlockPos pos,
-  // @NotNull BlockState state,
-  // @Nullable LivingEntity placer,
-  // @NotNull ItemStack stack) {
-
-  // LOGGER.info("Core block created at {}", pos);
-
-  // if (!level.isClientSide && level instanceof ServerLevel sLevel) {
-  // LockedZones lockedZones = LockedZones.get(sLevel);
-  // lockedZones.addZone(pos, 8, 8, 8, 8, 8, 8);
-
-  // boolean hasItem = level.getBlockEntity(pos) instanceof CoreEntity coreEntity
-  // && !coreEntity.inventory.getStackInSlot(0).isEmpty();
-
-  // lockedZones.setActive(pos, hasItem);
-  // level.setBlockAndUpdate(pos, state.setValue(ACTIVE, hasItem));
-  // }
-
-  // super.setPlacedBy(level, pos, state, placer, stack);
-  // }
 
   @Override
   public void onRemove(
