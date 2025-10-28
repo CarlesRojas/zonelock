@@ -151,9 +151,19 @@ public class ZoneEvents {
     }
 
     private static void showFeedback() {
-        Minecraft.getInstance().player.displayClientMessage(
-                Component.translatable("msg.pinya.zonelock.blocked_place"), true);
-        Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK.get(),
-                0.6f, 0.6f);
+        try {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player == null)
+                return;
+
+            mc.execute(() -> {
+                mc.player.displayClientMessage(
+                        Component.translatable("msg.pinya.zonelock.blocked_place"), true);
+                mc.player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.6f, 0.6f);
+            });
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to show feedback: {}", e.getMessage());
+        }
     }
 }
