@@ -54,8 +54,11 @@ public class Core extends BaseEntityBlock {
       LockedZones lockedZones = LockedZones.get(sLevel);
       lockedZones.addZone(pos, 8, 8, 8, 8, 8, 8);
 
-      lockedZones.setActive(pos, false);
-      level.setBlockAndUpdate(pos, state.setValue(ACTIVE, false));
+      boolean hasItem = level.getBlockEntity(pos) instanceof CoreEntity coreEntity
+          && !coreEntity.inventory.getStackInSlot(0).isEmpty();
+
+      lockedZones.setActive(pos, hasItem);
+      level.setBlockAndUpdate(pos, state.setValue(ACTIVE, hasItem));
     }
 
     super.setPlacedBy(level, pos, state, placer, stack);
