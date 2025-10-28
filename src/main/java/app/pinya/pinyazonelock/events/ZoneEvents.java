@@ -32,128 +32,128 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = ZoneLock.MOD_ID)
 public class ZoneEvents {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ZoneEvents.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZoneEvents.class);
 
-  private ZoneEvents() {
-  }
-
-  @SubscribeEvent
-  public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-    if (event.getEntity() instanceof ServerPlayer player) {
-      ServerLevel level = player.serverLevel();
-      LockedZones zones = LockedZones.get(level);
-      zones.syncToClients();
-    }
-  }
-
-  @SubscribeEvent
-  public static void onAnyBreak(BlockEvent.BreakEvent event) {
-    Player player = event.getPlayer();
-    if (player.isCreative())
-      return;
-
-    if (!(event.getLevel() instanceof ServerLevel level))
-      return;
-
-    BlockState state = event.getState();
-
-    if (state.is(ModBlocks.ZONE_LOCK_CORE.get()))
-      return;
-
-    BlockPos pos = event.getPos();
-
-    if (LockedZones.get(level).isPosInAnyZone(pos)) {
-      event.setCanceled(true);
-      showFeedback();
-    }
-  }
-
-  @SubscribeEvent
-  public static void onExplosionDetonate(ExplosionEvent.Detonate event) {
-    if (!(event.getLevel() instanceof ServerLevel level))
-      return;
-
-    event.getAffectedBlocks().removeIf((BlockPos pos) -> LockedZones.get(level).isPosInAnyZone(pos));
-  }
-
-  private static boolean isPlacementItem(Item item) {
-    if (item instanceof BlockItem)
-      return true;
-
-    if (item instanceof BucketItem)
-      return true;
-
-    if (item instanceof SpawnEggItem)
-      return true;
-
-    // if (item instanceof HangingEntityItem)
-    // return true;
-
-    // if (item instanceof ArmorStandItem)
-    // return true;
-
-    // if (item instanceof BoatItem)
-    // return true;
-
-    // if (item instanceof MinecartItem)
-    // return true;
-
-    return false;
-  }
-
-  private static boolean hasMenu(Level level, BlockPos pos, BlockState state) {
-    MenuProvider prov = state.getMenuProvider(level, pos);
-    return prov != null;
-  }
-
-  @SubscribeEvent
-  public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-    Player player = event.getEntity();
-    if (player.isCreative() || event.getItemStack().isEmpty())
-      return;
-
-    BlockPos pos = event.getPos();
-    BlockState state = event.getLevel().getBlockState(pos);
-    Level level = event.getLevel();
-    if (hasMenu(level, pos, state)) {
-      event.setUseItem(Event.Result.DENY);
-      return;
+    private ZoneEvents() {
     }
 
-    Item handItem = event.getItemStack().getItem();
-    if (!isPlacementItem(handItem))
-      return;
-
-    if (event.getLevel() instanceof ServerLevel serverLevel)
-      onRightClickBlockServer(event, serverLevel);
-    else
-      onRightClickBlockClient(event);
-  }
-
-  private static void onRightClickBlockServer(PlayerInteractEvent.RightClickBlock event,
-      ServerLevel level) {
-    BlockPos targetPos = event.getPos().relative(event.getFace());
-
-    if (LockedZones.get(level).isPosInAnyZone(targetPos)) {
-      event.setCanceled(true);
-      event.setCancellationResult(InteractionResult.FAIL);
+    @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ServerLevel level = player.serverLevel();
+            LockedZones zones = LockedZones.get(level);
+            zones.syncToClients();
+        }
     }
-  }
 
-  private static void onRightClickBlockClient(PlayerInteractEvent.RightClickBlock event) {
-    BlockPos targetPos = event.getPos().relative(event.getFace());
+    @SubscribeEvent
+    public static void onAnyBreak(BlockEvent.BreakEvent event) {
+        Player player = event.getPlayer();
+        if (player.isCreative())
+            return;
 
-    if (ClientLockedZones.getInstance().isPosInAnyZone(targetPos)) {
-      event.setCanceled(true);
-      event.setCancellationResult(InteractionResult.FAIL);
-      showFeedback();
+        if (!(event.getLevel() instanceof ServerLevel level))
+            return;
+
+        BlockState state = event.getState();
+
+        if (state.is(ModBlocks.ZONE_LOCK_CORE.get()))
+            return;
+
+        BlockPos pos = event.getPos();
+
+        if (LockedZones.get(level).isPosInAnyZone(pos)) {
+            event.setCanceled(true);
+            showFeedback();
+        }
     }
-  }
 
-  private static void showFeedback() {
-    Minecraft.getInstance().player.displayClientMessage(
-        Component.translatable("msg.pinya.zonelock.blocked_place"), true);
-    Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK.get(),
-        0.6f, 0.6f);
-  }
+    @SubscribeEvent
+    public static void onExplosionDetonate(ExplosionEvent.Detonate event) {
+        if (!(event.getLevel() instanceof ServerLevel level))
+            return;
+
+        event.getAffectedBlocks().removeIf((BlockPos pos) -> LockedZones.get(level).isPosInAnyZone(pos));
+    }
+
+    private static boolean isPlacementItem(Item item) {
+        if (item instanceof BlockItem)
+            return true;
+
+        if (item instanceof BucketItem)
+            return true;
+
+        if (item instanceof SpawnEggItem)
+            return true;
+
+        // if (item instanceof HangingEntityItem)
+        // return true;
+
+        // if (item instanceof ArmorStandItem)
+        // return true;
+
+        // if (item instanceof BoatItem)
+        // return true;
+
+        // if (item instanceof MinecartItem)
+        // return true;
+
+        return false;
+    }
+
+    private static boolean hasMenu(Level level, BlockPos pos, BlockState state) {
+        MenuProvider prov = state.getMenuProvider(level, pos);
+        return prov != null;
+    }
+
+    @SubscribeEvent
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        Player player = event.getEntity();
+        if (player.isCreative() || event.getItemStack().isEmpty())
+            return;
+
+        BlockPos pos = event.getPos();
+        BlockState state = event.getLevel().getBlockState(pos);
+        Level level = event.getLevel();
+        if (hasMenu(level, pos, state)) {
+            event.setUseItem(Event.Result.DENY);
+            return;
+        }
+
+        Item handItem = event.getItemStack().getItem();
+        if (!isPlacementItem(handItem))
+            return;
+
+        if (event.getLevel() instanceof ServerLevel serverLevel)
+            onRightClickBlockServer(event, serverLevel);
+        else
+            onRightClickBlockClient(event);
+    }
+
+    private static void onRightClickBlockServer(PlayerInteractEvent.RightClickBlock event,
+            ServerLevel level) {
+        BlockPos targetPos = event.getPos().relative(event.getFace());
+
+        if (LockedZones.get(level).isPosInAnyZone(targetPos)) {
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.FAIL);
+        }
+    }
+
+    private static void onRightClickBlockClient(PlayerInteractEvent.RightClickBlock event) {
+        BlockPos targetPos = event.getPos().relative(event.getFace());
+
+        if (ClientLockedZones.getInstance().isPosInAnyZone(targetPos)) {
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.FAIL);
+            showFeedback();
+        }
+    }
+
+    private static void showFeedback() {
+        Minecraft.getInstance().player.displayClientMessage(
+                Component.translatable("msg.pinya.zonelock.blocked_place"), true);
+        Minecraft.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK.get(),
+                0.6f, 0.6f);
+    }
 }

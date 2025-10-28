@@ -24,45 +24,45 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod(ZoneLock.MOD_ID)
 public class ZoneLock {
 
-  public static final String MOD_ID = "pinyazonelock";
+    public static final String MOD_ID = "pinyazonelock";
 
-  public ZoneLock() {
-    IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-    modEventBus.addListener(this::commonSetup);
-    MinecraftForge.EVENT_BUS.register(this);
+    public ZoneLock() {
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        modEventBus.addListener(this::commonSetup);
+        MinecraftForge.EVENT_BUS.register(this);
 
-    MinecraftForge.EVENT_BUS.register(app.pinya.pinyazonelock.events.ZoneEvents.class);
+        MinecraftForge.EVENT_BUS.register(app.pinya.pinyazonelock.events.ZoneEvents.class);
 
-    ModItems.register(modEventBus);
-    ModBlocks.register(modEventBus);
-    ModBlocksEntities.register(modEventBus);
-    ModMenuTypes.register(modEventBus);
+        ModItems.register(modEventBus);
+        ModBlocks.register(modEventBus);
+        ModBlocksEntities.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
 
-    modEventBus.addListener(this::addCreative);
-    ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-  }
-
-  private void commonSetup(final FMLCommonSetupEvent event) {
-    event.enqueueWork(() -> {
-      ModMessages.register();
-    });
-  }
-
-  private void addCreative(BuildCreativeModeTabContentsEvent event) {
-    if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
-      event.accept(ModBlocks.ZONE_LOCK_CORE);
+        modEventBus.addListener(this::addCreative);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
-  }
 
-  @SubscribeEvent
-  public void onServerStarting(ServerStartingEvent event) {
-  }
+    private void commonSetup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            ModMessages.register();
+        });
+    }
 
-  @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-  public static class ClientModEvents {
+    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            event.accept(ModBlocks.ZONE_LOCK_CORE);
+        }
+    }
+
     @SubscribeEvent
-    public static void onClientSetup(FMLClientSetupEvent event) {
-      MenuScreens.register(ModMenuTypes.ZONE_LOCK_CORE_MENU.get(), CoreScreen::new);
+    public void onServerStarting(ServerStartingEvent event) {
     }
-  }
+
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    public static class ClientModEvents {
+        @SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event) {
+            MenuScreens.register(ModMenuTypes.ZONE_LOCK_CORE_MENU.get(), CoreScreen::new);
+        }
+    }
 }
