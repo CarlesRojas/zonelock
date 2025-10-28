@@ -3,21 +3,27 @@ package app.pinya.pinyazonelock.block.entity.custom;
 import javax.annotation.Nullable;
 
 import app.pinya.pinyazonelock.block.entity.ModBlocksEntities;
+import app.pinya.pinyazonelock.screen.custom.ZoneLockCoreMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class ZoneLockCoreEntity extends BlockEntity {
+public class ZoneLockCoreEntity extends BlockEntity implements MenuProvider {
 
     public final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
@@ -50,6 +56,20 @@ public class ZoneLockCoreEntity extends BlockEntity {
 
         Containers.dropContents(this.level, this.worldPosition, inv);
     }
+
+    // MenuProvider
+
+    @Override
+    public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
+        return new ZoneLockCoreMenu(pContainerId, pPlayerInventory, this);
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.pinyazonelock.zonelockcore");
+    }
+
+    // BlockEntity
 
     @Override
     protected void saveAdditional(CompoundTag pTag, Provider pRegistries) {

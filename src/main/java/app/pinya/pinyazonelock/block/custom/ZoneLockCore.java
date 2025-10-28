@@ -9,11 +9,12 @@ import com.mojang.serialization.MapCodec;
 import app.pinya.pinyazonelock.block.entity.custom.ZoneLockCoreEntity;
 import app.pinya.pinyazonelock.world.LockedZones;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -88,21 +89,26 @@ public class ZoneLockCore extends BaseEntityBlock {
       BlockHitResult pHitResult) {
 
     if (pLevel.getBlockEntity(pPos) instanceof ZoneLockCoreEntity entity) {
-
-      if (entity.inventory.getStackInSlot(0).isEmpty() && !pStack.isEmpty()) {
-        entity.inventory.insertItem(0, pStack.copy(), false);
-        pStack.shrink(1);
-
-        // TODO change to an activation sound
-        pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
-      } else if (pStack.isEmpty()) {
-        ItemStack stackOnCore = entity.inventory.extractItem(0, 1, false);
-        pPlayer.setItemInHand(InteractionHand.MAIN_HAND, stackOnCore);
-        entity.clearContents();
-        // TODO change to a deactivation sound
-        pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
-
+      if (!pLevel.isClientSide()) {
+        ((ServerPlayer) pPlayer)
+            .openMenu(new SimpleMenuProvider(entity, Component.translatable("block.pinyazonelock.zonelockcore")), pPos);
       }
+
+      // if (entity.inventory.getStackInSlot(0).isEmpty() && !pStack.isEmpty()) {
+      // entity.inventory.insertItem(0, pStack.copy(), false);
+      // pStack.shrink(1);
+
+      // // TODO change to an activation sound
+      // pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS,
+      // 1f, 2f);
+      // } else if (pStack.isEmpty()) {
+      // ItemStack stackOnCore = entity.inventory.extractItem(0, 1, false);
+      // pPlayer.setItemInHand(InteractionHand.MAIN_HAND, stackOnCore);
+      // entity.clearContents();
+      // // TODO change to a deactivation sound
+      // pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS,
+      // 1f, 2f);
+      // }
 
     }
 
