@@ -3,7 +3,7 @@ package app.pinya.pinyazonelock.block;
 import java.util.function.Supplier;
 
 import app.pinya.pinyazonelock.ZoneLock;
-import app.pinya.pinyazonelock.block.custom.ZoneLockCore;
+import app.pinya.pinyazonelock.block.custom.Core;
 import app.pinya.pinyazonelock.item.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -19,11 +19,11 @@ public class ModBlocks {
   public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ZoneLock.MOD_ID);
 
   public static final RegistryObject<Block> ZONE_LOCK_CORE = registerBlock(
-      "zonelockcore",
-      () -> new ZoneLockCore(
+      "core",
+      () -> new Core(
           BlockBehaviour.Properties.of()
               .strength(4f)
-              .lightLevel(state -> state.getValue(ZoneLockCore.ACTIVE) ? 10 : 0)
+              .lightLevel(state -> state.getValue(Core.ACTIVE) ? 10 : 0)
               .sound(SoundType.DEEPSLATE_TILES))); // TODO change sound
 
   private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {

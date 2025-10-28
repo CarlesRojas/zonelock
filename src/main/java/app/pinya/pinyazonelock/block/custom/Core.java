@@ -28,11 +28,11 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class ZoneLockCore extends BaseEntityBlock {
+public class Core extends BaseEntityBlock {
   public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
-  public static final MapCodec<ZoneLockCore> CODEC = simpleCodec(ZoneLockCore::new);
+  public static final MapCodec<Core> CODEC = simpleCodec(Core::new);
 
-  public ZoneLockCore(Properties properties) {
+  public Core(Properties properties) {
     super(properties);
     this.registerDefaultState(this.stateDefinition.any().setValue(ACTIVE, false));
   }
@@ -91,7 +91,7 @@ public class ZoneLockCore extends BaseEntityBlock {
     if (pLevel.getBlockEntity(pPos) instanceof ZoneLockCoreEntity entity) {
       if (!pLevel.isClientSide()) {
         ((ServerPlayer) pPlayer)
-            .openMenu(new SimpleMenuProvider(entity, Component.translatable("block.pinyazonelock.zonelockcore")), pPos);
+            .openMenu(new SimpleMenuProvider(entity, Component.translatable("block.pinyazonelock.core")), pPos);
       }
     }
 

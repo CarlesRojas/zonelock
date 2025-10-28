@@ -3,7 +3,7 @@ package app.pinya.pinyazonelock.screen.custom;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import app.pinya.pinyazonelock.ZoneLock;
-import app.pinya.pinyazonelock.block.custom.ZoneLockCore;
+import app.pinya.pinyazonelock.block.custom.Core;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -13,10 +13,10 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class ZoneLockCoreScreen extends AbstractContainerScreen<ZoneLockCoreMenu> {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(ZoneLock.MOD_ID,
-            "textures/gui/zonelockcore.png");
+            "textures/gui/core.png");
 
     private static final ResourceLocation ACTIVE_TEXTURE = ResourceLocation.fromNamespaceAndPath(ZoneLock.MOD_ID,
-            "textures/gui/zonelockcore_active.png");
+            "textures/gui/core_active.png");
 
     private boolean lastActiveState;
 
@@ -24,7 +24,7 @@ public class ZoneLockCoreScreen extends AbstractContainerScreen<ZoneLockCoreMenu
         super(menu, playerInventory, title);
         this.imageHeight = 247;
         this.inventoryLabelY = this.imageHeight - 94;
-        this.lastActiveState = menu.blockEntity.getBlockState().getValue(ZoneLockCore.ACTIVE);
+        this.lastActiveState = menu.blockEntity.getBlockState().getValue(Core.ACTIVE);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class ZoneLockCoreScreen extends AbstractContainerScreen<ZoneLockCoreMenu
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
-        boolean isActive = menu.blockEntity.getBlockState().getValue(ZoneLockCore.ACTIVE);
+        boolean isActive = menu.blockEntity.getBlockState().getValue(Core.ACTIVE);
 
         if (isActive != lastActiveState)
             lastActiveState = isActive;

@@ -1,4 +1,4 @@
 {
-    "block.pinyazonelock.zonelockcore": "Zone Lock Core",
+    "block.pinyazonelock.core": "Zone Lock Core",
     "msg.pinya.zonelock.blocked_place": "Zone Locked"
 }

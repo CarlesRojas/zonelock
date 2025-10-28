@@ -2,7 +2,7 @@ package app.pinya.pinyazonelock.block.entity.custom;
 
 import javax.annotation.Nullable;
 
-import app.pinya.pinyazonelock.block.custom.ZoneLockCore;
+import app.pinya.pinyazonelock.block.custom.Core;
 import app.pinya.pinyazonelock.block.entity.ModBlocksEntities;
 import app.pinya.pinyazonelock.screen.custom.ZoneLockCoreMenu;
 import app.pinya.pinyazonelock.world.LockedZones;
@@ -42,7 +42,7 @@ public class ZoneLockCoreEntity extends BlockEntity implements MenuProvider {
                 boolean hasItem = !getStackInSlot(0).isEmpty();
                 BlockPos zonePos = getBlockPos();
 
-                BlockState newState = getBlockState().setValue(ZoneLockCore.ACTIVE, hasItem);
+                BlockState newState = getBlockState().setValue(Core.ACTIVE, hasItem);
                 level.setBlockAndUpdate(zonePos, newState);
 
                 if (level instanceof ServerLevel serverLevel)
@@ -79,7 +79,7 @@ public class ZoneLockCoreEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.pinyazonelock.zonelockcore");
+        return Component.translatable("block.pinyazonelock.core");
     }
 
     // BlockEntity
