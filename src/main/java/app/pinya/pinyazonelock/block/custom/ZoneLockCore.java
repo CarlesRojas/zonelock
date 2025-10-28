@@ -34,6 +34,7 @@ public class ZoneLockCore extends BaseEntityBlock {
 
   public ZoneLockCore(Properties properties) {
     super(properties);
+    this.registerDefaultState(this.stateDefinition.any().setValue(ACTIVE, false));
   }
 
   @Override
@@ -53,9 +54,8 @@ public class ZoneLockCore extends BaseEntityBlock {
       LockedZones lockedZones = LockedZones.get(sLevel);
       lockedZones.addZone(pos, 8, 8, 8, 8, 8, 8);
 
-      // TODO activate zone when a metal block is placed in the UI
-      lockedZones.setActive(pos, true);
-      level.setBlockAndUpdate(pos, state.setValue(ACTIVE, true));
+      lockedZones.setActive(pos, false);
+      level.setBlockAndUpdate(pos, state.setValue(ACTIVE, false));
     }
 
     super.setPlacedBy(level, pos, state, placer, stack);
@@ -93,23 +93,6 @@ public class ZoneLockCore extends BaseEntityBlock {
         ((ServerPlayer) pPlayer)
             .openMenu(new SimpleMenuProvider(entity, Component.translatable("block.pinyazonelock.zonelockcore")), pPos);
       }
-
-      // if (entity.inventory.getStackInSlot(0).isEmpty() && !pStack.isEmpty()) {
-      // entity.inventory.insertItem(0, pStack.copy(), false);
-      // pStack.shrink(1);
-
-      // // TODO change to an activation sound
-      // pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS,
-      // 1f, 2f);
-      // } else if (pStack.isEmpty()) {
-      // ItemStack stackOnCore = entity.inventory.extractItem(0, 1, false);
-      // pPlayer.setItemInHand(InteractionHand.MAIN_HAND, stackOnCore);
-      // entity.clearContents();
-      // // TODO change to a deactivation sound
-      // pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS,
-      // 1f, 2f);
-      // }
-
     }
 
     return ItemInteractionResult.SUCCESS;
@@ -129,5 +112,4 @@ public class ZoneLockCore extends BaseEntityBlock {
   protected MapCodec<? extends BaseEntityBlock> codec() {
     return CODEC;
   }
-
 }

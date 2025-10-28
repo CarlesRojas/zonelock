@@ -2,8 +2,10 @@ package app.pinya.pinyazonelock.block.entity.custom;
 
 import javax.annotation.Nullable;
 
+import app.pinya.pinyazonelock.block.custom.ZoneLockCore;
 import app.pinya.pinyazonelock.block.entity.ModBlocksEntities;
 import app.pinya.pinyazonelock.screen.custom.ZoneLockCoreMenu;
+import app.pinya.pinyazonelock.world.LockedZones;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderLookup.Provider;
@@ -12,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -35,8 +38,18 @@ public class ZoneLockCoreEntity extends BlockEntity implements MenuProvider {
         protected void onContentsChanged(int slot) {
             setChanged();
 
-            if (!level.isClientSide())
-                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            if (!level.isClientSide()) {
+                boolean hasItem = !getStackInSlot(0).isEmpty();
+                BlockPos zonePos = getBlockPos();
+
+                BlockState newState = getBlockState().setValue(ZoneLockCore.ACTIVE, hasItem);
+                level.setBlockAndUpdate(zonePos, newState);
+
+                if (level instanceof ServerLevel serverLevel)
+                    LockedZones.get(serverLevel).setActive(zonePos, hasItem);
+
+                level.sendBlockUpdated(zonePos, getBlockState(), newState, 3);
+            }
         }
     };
 
@@ -93,5 +106,4 @@ public class ZoneLockCoreEntity extends BlockEntity implements MenuProvider {
     public CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
         return saveWithoutMetadata(pRegistries);
     }
-
 }
