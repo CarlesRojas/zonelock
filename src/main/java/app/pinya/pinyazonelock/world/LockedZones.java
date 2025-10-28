@@ -68,9 +68,9 @@ public class LockedZones extends SavedData {
   }
 
   public boolean isPosInAnyZone(BlockPos pos) {
-    LOGGER.debug("---------------------- ZONES ----------------------");
+    // LOGGER.debug("---------------------- ZONES ----------------------");
     for (Zone z : zones.values()) {
-      LOGGER.debug("Zone center {}: {}", z.center(), z.contains(pos));
+      // LOGGER.debug("Zone center {}: {}", z.center(), z.contains(pos));
       if (z.active() && z.contains(pos))
         return true;
     }

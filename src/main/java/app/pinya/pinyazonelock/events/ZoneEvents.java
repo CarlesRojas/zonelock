@@ -14,11 +14,22 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorStandItem;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BoatItem;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.HangingEntityItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.MinecartItem;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -60,13 +71,53 @@ public class ZoneEvents {
     }
   }
 
+  private static boolean isPlacementItem(Item item) {
+    if (item instanceof BlockItem)
+      return true;
+
+    if (item instanceof HangingEntityItem)
+      return true;
+
+    if (item instanceof ArmorStandItem)
+      return true;
+
+    if (item instanceof BucketItem)
+      return true;
+
+    if (item instanceof SpawnEggItem)
+      return true;
+
+    if (item instanceof BoatItem)
+      return true;
+
+    if (item instanceof MinecartItem)
+      return true;
+
+    return false;
+  }
+
+  private static boolean hasMenu(Level level, BlockPos pos, BlockState state) {
+    MenuProvider prov = state.getMenuProvider(level, pos);
+    return prov != null;
+  }
+
   @SubscribeEvent
   public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
     Player player = event.getEntity();
-    if (player.isCreative())
+    if (player.isCreative() || event.getItemStack().isEmpty())
       return;
 
-    // BUG when you right click to place an item in the block, this blocks it
+    BlockPos pos = event.getPos();
+    BlockState state = event.getLevel().getBlockState(pos);
+    Level level = event.getLevel();
+    if (hasMenu(level, pos, state)) {
+      event.setUseItem(Event.Result.DENY);
+      return;
+    }
+
+    Item handItem = event.getItemStack().getItem();
+    if (!isPlacementItem(handItem))
+      return;
 
     if (event.getLevel() instanceof ServerLevel serverLevel)
       onRightClickBlockServer(event, serverLevel);
@@ -74,7 +125,8 @@ public class ZoneEvents {
       onRightClickBlockClient(event);
   }
 
-  private static void onRightClickBlockServer(PlayerInteractEvent.RightClickBlock event, ServerLevel level) {
+  private static void onRightClickBlockServer(PlayerInteractEvent.RightClickBlock event,
+      ServerLevel level) {
     BlockPos targetPos = event.getPos().relative(event.getFace());
 
     if (LockedZones.get(level).isPosInAnyZone(targetPos)) {
