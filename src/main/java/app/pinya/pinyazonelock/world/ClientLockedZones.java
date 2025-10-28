@@ -4,8 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -16,71 +14,44 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientLockedZones {
-    private static volatile ClientLockedZones INSTANCE;
-    private static final Object INSTANCE_LOCK = new Object();
+    private static ClientLockedZones INSTANCE;
     private final Map<UUID, LockedZones.Zone> zones = new LinkedHashMap<>();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private ClientLockedZones() {
     }
 
     public static ClientLockedZones getInstance() {
-        ClientLockedZones result = INSTANCE;
-        if (result == null) {
-            synchronized (INSTANCE_LOCK) {
-                result = INSTANCE;
-                if (result == null) {
-                    INSTANCE = result = new ClientLockedZones();
-                }
-            }
+        if (INSTANCE == null) {
+            INSTANCE = new ClientLockedZones();
         }
-        return result;
+        return INSTANCE;
     }
 
     public void clear() {
-        lock.writeLock().lock();
-        try {
-            zones.clear();
-        } finally {
-            lock.writeLock().unlock();
-        }
+        zones.clear();
     }
 
     public void updateFromPacket(CompoundTag tag) {
-        lock.writeLock().lock();
-        try {
-            clear();
-            ListTag list = tag.getList("locked_zones", Tag.TAG_COMPOUND);
+        clear();
+        ListTag list = tag.getList("locked_zones", Tag.TAG_COMPOUND);
 
-            for (int i = 0; i < list.size(); i++) {
-                CompoundTag zt = list.getCompound(i);
-                LockedZones.Zone z = LockedZones.Zone.loadFromTag(zt);
-                zones.putIfAbsent(z.id(), z);
-            }
-        } finally {
-            lock.writeLock().unlock();
+        for (int i = 0; i < list.size(); i++) {
+            CompoundTag zt = list.getCompound(i);
+            LockedZones.Zone z = LockedZones.Zone.loadFromTag(zt);
+            zones.putIfAbsent(z.id(), z);
         }
     }
 
     public List<LockedZones.Zone> getAllZones() {
-        lock.readLock().lock();
-        try {
-            return List.copyOf(zones.values());
-        } finally {
-            lock.readLock().unlock();
-        }
+        return List.copyOf(zones.values());
     }
 
     public boolean isPosInAnyZone(BlockPos pos) {
-        lock.readLock().lock();
-        try {
-            for (LockedZones.Zone z : zones.values()) {
-                if (z.active() && z.contains(pos))
-                    return true;
-            }
-            return false;
-        } finally {
-            lock.readLock().unlock();
+        for (LockedZones.Zone z : zones.values()) {
+            if (z.active() && z.contains(pos))
+                return true;
         }
+
+        return false;
     }
 }
