@@ -16,13 +16,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorStandItem;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.item.HangingEntityItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.MinecartItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -75,23 +71,23 @@ public class ZoneEvents {
     if (item instanceof BlockItem)
       return true;
 
-    if (item instanceof HangingEntityItem)
-      return true;
-
-    if (item instanceof ArmorStandItem)
-      return true;
-
     if (item instanceof BucketItem)
       return true;
 
     if (item instanceof SpawnEggItem)
       return true;
 
-    if (item instanceof BoatItem)
-      return true;
+    // if (item instanceof HangingEntityItem)
+    // return true;
 
-    if (item instanceof MinecartItem)
-      return true;
+    // if (item instanceof ArmorStandItem)
+    // return true;
+
+    // if (item instanceof BoatItem)
+    // return true;
+
+    // if (item instanceof MinecartItem)
+    // return true;
 
     return false;
   }
