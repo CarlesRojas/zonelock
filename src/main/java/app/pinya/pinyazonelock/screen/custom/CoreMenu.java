@@ -18,6 +18,9 @@ public class CoreMenu extends AbstractContainerMenu {
     public final CoreEntity blockEntity;
     private final Level level;
 
+    public static final int MIN_SIDE = 0;
+    public static final int MAX_SIDE = 16;
+
     public CoreMenu(int contianerId, Inventory inv, FriendlyByteBuf extraData) {
         this(contianerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
     }
@@ -31,6 +34,20 @@ public class CoreMenu extends AbstractContainerMenu {
         addPlayerHotbar(inv);
 
         this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 0, 130, 128));
+    }
+
+    public void incrementUpBlocks() {
+        if (blockEntity.getUpBlocks() < MAX_SIDE) {
+            int newValue = blockEntity.getUpBlocks() + 1;
+            blockEntity.setUpBlocks(newValue);
+        }
+    }
+
+    public void decrementUpBlocks() {
+        if (blockEntity.getUpBlocks() > MIN_SIDE) {
+            int newValue = blockEntity.getUpBlocks() - 1;
+            blockEntity.setUpBlocks(newValue);
+        }
     }
 
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
@@ -110,5 +127,4 @@ public class CoreMenu extends AbstractContainerMenu {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 223));
         }
     }
-
 }

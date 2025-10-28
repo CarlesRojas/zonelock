@@ -28,6 +28,15 @@ public class ModMessages {
                     context.setPacketHandled(true);
                 })
                 .add();
+
+        CHANNEL.messageBuilder(UpdateZoneDimensionsC2SPacket.class, packetId++)
+                .encoder((packet, buffer) -> packet.toBytes(buffer))
+                .decoder(UpdateZoneDimensionsC2SPacket::new)
+                .consumerMainThread((packet, context) -> {
+                    packet.handle(() -> context);
+                    context.setPacketHandled(true);
+                })
+                .add();
     }
 
     public static void sendToPlayer(ZoneDataSyncS2CPacket packet, ServerPlayer player) {

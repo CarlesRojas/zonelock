@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import app.pinya.pinyazonelock.block.custom.Core;
 import app.pinya.pinyazonelock.block.entity.ModBlocksEntities;
+import app.pinya.pinyazonelock.networking.ModMessages;
+import app.pinya.pinyazonelock.networking.UpdateZoneDimensionsC2SPacket;
 import app.pinya.pinyazonelock.screen.custom.CoreMenu;
 import app.pinya.pinyazonelock.world.LockedZones;
 import net.minecraft.core.BlockPos;
@@ -28,6 +30,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.network.PacketDistributor;
 
 public class CoreEntity extends BlockEntity implements MenuProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(Core.class);
@@ -131,12 +134,12 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
         pTag.put("inventory", inventory.serializeNBT(pRegistries));
         pTag.putBoolean("initialized", initialized);
 
+        pTag.putInt("upBlocks", upBlocks);
+        pTag.putInt("downBlocks", downBlocks);
         pTag.putInt("northBlocks", northBlocks);
         pTag.putInt("southBlocks", southBlocks);
         pTag.putInt("eastBlocks", eastBlocks);
         pTag.putInt("westBlocks", westBlocks);
-        pTag.putInt("upBlocks", upBlocks);
-        pTag.putInt("downBlocks", downBlocks);
     }
 
     @Override
@@ -145,12 +148,12 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
         inventory.deserializeNBT(pRegistries, pTag.getCompound("inventory"));
         initialized = pTag.getBoolean("initialized");
 
+        upBlocks = pTag.getInt("upBlocks");
+        downBlocks = pTag.getInt("downBlocks");
         northBlocks = pTag.getInt("northBlocks");
         southBlocks = pTag.getInt("southBlocks");
         eastBlocks = pTag.getInt("eastBlocks");
         westBlocks = pTag.getInt("westBlocks");
-        upBlocks = pTag.getInt("upBlocks");
-        downBlocks = pTag.getInt("downBlocks");
     }
 
     public void setZoneDimensions(int up, int down, int north, int south, int east, int west) {
@@ -161,20 +164,101 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
         eastBlocks = east;
         westBlocks = west;
 
-        if (!level.isClientSide && level instanceof ServerLevel sLevel)
-            LockedZones.get(sLevel).updateZone(worldPosition, up, down, north, south, east, west);
+        if (level.isClientSide)
+            ModMessages.CHANNEL.send(
+                    new UpdateZoneDimensionsC2SPacket(worldPosition, up, down, north, south, east, west),
+                    PacketDistributor.SERVER.noArg());
+    }
 
-        setChanged();
+    public void setZoneDimensionsServer(int up, int down, int north, int south, int east, int west) {
+        if (!level.isClientSide && level instanceof ServerLevel serverLevel) {
+
+            upBlocks = up;
+            downBlocks = down;
+            northBlocks = north;
+            southBlocks = south;
+            eastBlocks = east;
+            westBlocks = west;
+
+            LockedZones.get(serverLevel).updateZone(worldPosition, up, down, north, south, east, west);
+
+            setChanged();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    public int getUpBlocks() {
+        return upBlocks;
+    }
+
+    public void setUpBlocks(int value) {
+        setZoneDimensions(value, downBlocks, northBlocks, southBlocks, eastBlocks, westBlocks);
+    }
+
+    public int getDownBlocks() {
+        return downBlocks;
+    }
+
+    public void setDownBlocks(int value) {
+        setZoneDimensions(upBlocks, value, northBlocks, southBlocks, eastBlocks, westBlocks);
+    }
+
+    public int getNorthBlocks() {
+        return northBlocks;
+    }
+
+    public void setNorthBlocks(int value) {
+        setZoneDimensions(upBlocks, downBlocks, value, southBlocks, eastBlocks, westBlocks);
+    }
+
+    public int getSouthBlocks() {
+        return southBlocks;
+    }
+
+    public void setSouthBlocks(int value) {
+        setZoneDimensions(upBlocks, downBlocks, northBlocks, value, eastBlocks, westBlocks);
+    }
+
+    public int getEastBlocks() {
+        return eastBlocks;
+    }
+
+    public void setEastBlocks(int value) {
+        setZoneDimensions(upBlocks, downBlocks, northBlocks, southBlocks, value, westBlocks);
+    }
+
+    public int getWestBlocks() {
+        return westBlocks;
+    }
+
+    public void setWestBlocks(int value) {
+        setZoneDimensions(upBlocks, downBlocks, northBlocks, southBlocks, eastBlocks, value);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
+        CompoundTag tag = super.getUpdateTag(pRegistries);
+        saveAdditional(tag, pRegistries);
+        return tag;
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag, Provider pRegistries) {
+        super.handleUpdateTag(tag, pRegistries);
+        loadAdditional(tag, pRegistries);
+    }
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+
+        if (level != null && !level.isClientSide)
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
     }
 
     @Nullable
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
-        return saveWithoutMetadata(pRegistries);
     }
 }
