@@ -49,8 +49,8 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
     public static final int MAX_SIDE_IRON = 8;
     public static final int MAX_SIDE_GOLD = 16;
     public static final int MAX_SIDE_EMERALD = 32;
-    public static final int MAX_SIDE_DIAMOND = 64;
-    public static final int MAX_SIDE_NETHERITE = 128;
+    public static final int MAX_SIDE_LAPIS = 64;
+    public static final int MAX_SIDE_DIAMOND = 128;
 
     public final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
@@ -63,8 +63,8 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
             return stack.is(Items.IRON_BLOCK) ||
                     stack.is(Items.GOLD_BLOCK) ||
                     stack.is(Items.EMERALD_BLOCK) ||
-                    stack.is(Items.DIAMOND_BLOCK) ||
-                    stack.is(Items.NETHERITE_BLOCK);
+                    stack.is(Items.LAPIS_BLOCK) ||
+                    stack.is(Items.DIAMOND_BLOCK);
         }
 
         @Override
@@ -218,10 +218,10 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
             return MAX_SIDE_GOLD;
         if (item == Items.EMERALD_BLOCK)
             return MAX_SIDE_EMERALD;
+        if (item == Items.LAPIS_BLOCK)
+            return MAX_SIDE_LAPIS;
         if (item == Items.DIAMOND_BLOCK)
             return MAX_SIDE_DIAMOND;
-        if (item == Items.NETHERITE_BLOCK)
-            return MAX_SIDE_NETHERITE;
 
         return 0;
     }

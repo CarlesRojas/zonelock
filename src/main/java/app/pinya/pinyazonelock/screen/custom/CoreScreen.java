@@ -16,6 +16,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Core.class);
@@ -48,6 +50,10 @@ public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
     private int MID_TOP_Y = 43;
     private int MID_BOT_Y = 78;
     private int BOT_Y = 98;
+
+    private int ITEMS_Y = 127;
+    private int ITEMS_X = 13;
+    private int ITEMS_SEPARATION = 22;
 
     public CoreScreen(CoreMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -303,6 +309,19 @@ public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
                 Math.round((y + MID_TOP_Y + TEXT_DISPL - LABEL_DISPL_TOP) / scale), 0x8d6acc, false);
 
         guiGraphics.pose().popPose();
+
+        // Render Items
+        ItemStack ironBlock = new ItemStack(Items.IRON_BLOCK);
+        guiGraphics.renderItem(ironBlock, x + ITEMS_X, y + ITEMS_Y);
+        ItemStack goldBlock = new ItemStack(Items.GOLD_BLOCK);
+        guiGraphics.renderItem(goldBlock, x + ITEMS_X + ITEMS_SEPARATION, y + ITEMS_Y);
+        ItemStack emeraldBlock = new ItemStack(Items.EMERALD_BLOCK);
+        guiGraphics.renderItem(emeraldBlock, x + ITEMS_X + ITEMS_SEPARATION * 2, y + ITEMS_Y);
+        ItemStack lapisBlock = new ItemStack(Items.LAPIS_BLOCK);
+        guiGraphics.renderItem(lapisBlock, x + ITEMS_X + ITEMS_SEPARATION * 3, y + ITEMS_Y);
+        ItemStack diamondBlock = new ItemStack(Items.DIAMOND_BLOCK);
+        guiGraphics.renderItem(diamondBlock, x + ITEMS_X + ITEMS_SEPARATION * 4, y + ITEMS_Y);
+
     }
 
     private int getStringWidth(String text, int x, int mod) {
