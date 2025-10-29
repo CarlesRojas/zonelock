@@ -1,4 +1,11 @@
 {
     "block.pinyazonelock.core": "Zone Lock Core",
-    "msg.pinya.zonelock.blocked_place": "Zone Locked"
+    "msg.pinya.zonelock.blocked_place": "Zone Locked",
+
+    "gui.pinyazonelock.up": "Up",
+    "gui.pinyazonelock.down": "Down",
+    "gui.pinyazonelock.north": "North",
+    "gui.pinyazonelock.south": "South",
+    "gui.pinyazonelock.east": "East",
+    "gui.pinyazonelock.west": "West"
 }

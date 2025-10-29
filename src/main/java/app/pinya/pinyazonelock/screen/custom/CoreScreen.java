@@ -1,18 +1,24 @@
 package app.pinya.pinyazonelock.screen.custom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import app.pinya.pinyazonelock.ZoneLock;
 import app.pinya.pinyazonelock.block.custom.Core;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Core.class);
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(ZoneLock.MOD_ID,
             "textures/gui/core.png");
 
@@ -34,7 +40,9 @@ public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
 
     private int HALF_BUTTON = 5;
     private int TEXT_DISPL = 2;
-    private int SEPARATION_X = 18;
+    private int LABEL_DISPL_TOP = 7;
+    private int LABEL_DISPL_BOT = 10;
+    private int SEPARATION_X = 17;
     private int DISPL_X = 56;
     private int TOP_Y = 23;
     private int MID_TOP_Y = 43;
@@ -215,39 +223,90 @@ public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
 
         // UP
         String upBlocksText = Integer.toString(menu.blockEntity.getUpBlocks());
-        int upTextWidth = font.width(upBlocksText);
-        int upTextX = (int) (x + Math.ceil(imageWidth / 2.0) - Math.floor(upTextWidth / 2.0)) + 1;
+        int upTextX = getStringWidth(upBlocksText, x, 0);
         guiGraphics.drawString(font, upBlocksText, upTextX, y + TOP_Y + TEXT_DISPL, 0x404040, false);
 
         // DOWN
         String downBlocksText = Integer.toString(menu.blockEntity.getDownBlocks());
-        int downTextWidth = font.width(downBlocksText);
-        int downTextX = (int) (x + Math.ceil(imageWidth / 2.0) - Math.floor(downTextWidth / 2.0)) + 1;
+        int downTextX = getStringWidth(downBlocksText, x, 0);
         guiGraphics.drawString(font, downBlocksText, downTextX, y + BOT_Y + TEXT_DISPL, 0x404040, false);
 
         // NORTH
         String northBlocksText = Integer.toString(menu.blockEntity.getNorthBlocks());
-        int northTextWidth = font.width(northBlocksText);
-        int northTextX = (int) (x + Math.ceil(imageWidth / 2.0) - Math.floor(northTextWidth / 2.0)) + 1 + DISPL_X;
+        int northTextX = getStringWidth(northBlocksText, x, DISPL_X);
         guiGraphics.drawString(font, northBlocksText, northTextX, y + MID_TOP_Y + TEXT_DISPL, 0x404040, false);
 
         // SOUTH
         String southBlocksText = Integer.toString(menu.blockEntity.getSouthBlocks());
-        int southTextWidth = font.width(southBlocksText);
-        int southTextX = (int) (x + Math.ceil(imageWidth / 2.0) - Math.floor(southTextWidth / 2.0)) + 1 - DISPL_X;
+        int southTextX = getStringWidth(southBlocksText, x, -DISPL_X);
         guiGraphics.drawString(font, southBlocksText, southTextX, y + MID_BOT_Y + TEXT_DISPL, 0x404040, false);
 
         // EAST
         String eastBlocksText = Integer.toString(menu.blockEntity.getEastBlocks());
-        int eastTextWidth = font.width(eastBlocksText);
-        int eastTextX = (int) (x + Math.ceil(imageWidth / 2.0) - Math.floor(eastTextWidth / 2.0)) + 1 + DISPL_X;
+        int eastTextX = getStringWidth(eastBlocksText, x, DISPL_X);
         guiGraphics.drawString(font, eastBlocksText, eastTextX, y + MID_BOT_Y + TEXT_DISPL, 0x404040, false);
 
         // WEST
         String westBlocksText = Integer.toString(menu.blockEntity.getWestBlocks());
-        int westTextWidth = font.width(westBlocksText);
-        int westTextX = (int) (x + Math.ceil(imageWidth / 2.0) - Math.floor(westTextWidth / 2.0)) + 1 - DISPL_X;
+        int westTextX = getStringWidth(westBlocksText, x, -DISPL_X);
         guiGraphics.drawString(font, westBlocksText, westTextX, y + MID_TOP_Y + TEXT_DISPL, 0x404040, false);
+
+        float scale = 0.5f;
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().scale(scale, scale, 1.0f);
+
+        MutableComponent upLabelText = Component.translatable("gui.pinyazonelock.up").withStyle(ChatFormatting.BOLD);
+        int upLabelX = getStringWidth(upLabelText, x, 0);
+        guiGraphics.drawString(font, upLabelText,
+                Math.round(upLabelX / scale),
+                Math.round((y + TOP_Y + TEXT_DISPL - LABEL_DISPL_TOP) / scale), 0x8d6acc, false);
+
+        MutableComponent downLabelText = Component.translatable("gui.pinyazonelock.down")
+                .withStyle(ChatFormatting.BOLD);
+        int downLabelX = getStringWidth(downLabelText, x, 0);
+        guiGraphics.drawString(font, downLabelText,
+                Math.round(downLabelX / scale),
+                Math.round((y + BOT_Y + TEXT_DISPL + LABEL_DISPL_BOT) / scale), 0x8d6acc, false);
+
+        MutableComponent northLabelText = Component.translatable("gui.pinyazonelock.north")
+                .withStyle(ChatFormatting.BOLD);
+        int northLabelX = getStringWidth(northLabelText, x, DISPL_X);
+        guiGraphics.drawString(font, northLabelText,
+                Math.round(northLabelX / scale),
+                Math.round((y + MID_TOP_Y + TEXT_DISPL - LABEL_DISPL_TOP) / scale), 0x8d6acc, false);
+
+        MutableComponent southLabelText = Component.translatable("gui.pinyazonelock.south")
+                .withStyle(ChatFormatting.BOLD);
+        int southLabelX = getStringWidth(southLabelText, x, -DISPL_X);
+        guiGraphics.drawString(font, southLabelText,
+                Math.round(southLabelX / scale),
+                Math.round((y + MID_BOT_Y + TEXT_DISPL + LABEL_DISPL_BOT) / scale), 0x8d6acc, false);
+
+        MutableComponent eastLabelText = Component.translatable("gui.pinyazonelock.east")
+                .withStyle(ChatFormatting.BOLD);
+        int eastLabelX = getStringWidth(eastLabelText, x, DISPL_X);
+        guiGraphics.drawString(font, eastLabelText,
+                Math.round(eastLabelX / scale),
+                Math.round((y + MID_BOT_Y + TEXT_DISPL + LABEL_DISPL_BOT) / scale), 0x8d6acc, false);
+
+        MutableComponent westLabelText = Component.translatable("gui.pinyazonelock.west")
+                .withStyle(ChatFormatting.BOLD);
+        int westLabelX = getStringWidth(westLabelText, x, -DISPL_X);
+        guiGraphics.drawString(font, westLabelText,
+                Math.round(westLabelX / scale),
+                Math.round((y + MID_TOP_Y + TEXT_DISPL - LABEL_DISPL_TOP) / scale), 0x8d6acc, false);
+
+        guiGraphics.pose().popPose();
+    }
+
+    private int getStringWidth(String text, int x, int mod) {
+        int textWidth = font.width(text);
+        return (int) (x + Math.ceil(imageWidth / 2.0) - Math.floor(textWidth / 2.0)) + 1 + mod;
+    }
+
+    private int getStringWidth(Component text, int x, int mod) {
+        int textWidth = font.width(text);
+        return (int) (x + Math.ceil(imageWidth / 2.0) - Math.floor(textWidth / 4.0)) + 1 + mod;
     }
 
     @Override
