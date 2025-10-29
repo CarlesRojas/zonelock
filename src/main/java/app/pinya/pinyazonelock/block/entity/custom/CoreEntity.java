@@ -26,7 +26,9 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
@@ -44,10 +46,25 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
     private int upBlocks = 8;
     private int downBlocks = 8;
 
+    public static final int MAX_SIDE_IRON = 8;
+    public static final int MAX_SIDE_GOLD = 16;
+    public static final int MAX_SIDE_EMERALD = 32;
+    public static final int MAX_SIDE_DIAMOND = 64;
+    public static final int MAX_SIDE_NETHERITE = 128;
+
     public final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
         protected int getStackLimit(int slot, ItemStack stack) {
             return 1;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return stack.is(Items.IRON_BLOCK) ||
+                    stack.is(Items.GOLD_BLOCK) ||
+                    stack.is(Items.EMERALD_BLOCK) ||
+                    stack.is(Items.DIAMOND_BLOCK) ||
+                    stack.is(Items.NETHERITE_BLOCK);
         }
 
         @Override
@@ -185,6 +202,27 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
             setChanged();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         }
+    }
+
+    public int getMaxSideBlocks() {
+        ItemStack stack = inventory.getStackInSlot(0);
+        if (stack.isEmpty())
+            return 0;
+
+        Item item = stack.getItem();
+
+        if (item == Items.IRON_BLOCK)
+            return MAX_SIDE_IRON;
+        if (item == Items.GOLD_BLOCK)
+            return MAX_SIDE_GOLD;
+        if (item == Items.EMERALD_BLOCK)
+            return MAX_SIDE_EMERALD;
+        if (item == Items.DIAMOND_BLOCK)
+            return MAX_SIDE_DIAMOND;
+        if (item == Items.NETHERITE_BLOCK)
+            return MAX_SIDE_NETHERITE;
+
+        return 0;
     }
 
     public int getUpBlocks() {

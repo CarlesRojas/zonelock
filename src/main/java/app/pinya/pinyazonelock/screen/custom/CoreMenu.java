@@ -19,7 +19,6 @@ public class CoreMenu extends AbstractContainerMenu {
     private final Level level;
 
     public static final int MIN_SIDE = 0;
-    public static final int MAX_SIDE = 16;
 
     public CoreMenu(int contianerId, Inventory inv, FriendlyByteBuf extraData) {
         this(contianerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
@@ -37,7 +36,8 @@ public class CoreMenu extends AbstractContainerMenu {
     }
 
     public void incrementUpBlocks() {
-        if (blockEntity.getUpBlocks() < MAX_SIDE) {
+        int maxSide = blockEntity.getMaxSideBlocks();
+        if (blockEntity.getUpBlocks() < maxSide) {
             int newValue = blockEntity.getUpBlocks() + 1;
             blockEntity.setUpBlocks(newValue);
         }
@@ -51,7 +51,8 @@ public class CoreMenu extends AbstractContainerMenu {
     }
 
     public void incrementDownBlocks() {
-        if (blockEntity.getDownBlocks() < MAX_SIDE) {
+        int maxSide = blockEntity.getMaxSideBlocks();
+        if (blockEntity.getDownBlocks() < maxSide) {
             int newValue = blockEntity.getDownBlocks() + 1;
             blockEntity.setDownBlocks(newValue);
         }
@@ -65,7 +66,8 @@ public class CoreMenu extends AbstractContainerMenu {
     }
 
     public void incrementNorthBlocks() {
-        if (blockEntity.getNorthBlocks() < MAX_SIDE) {
+        int maxSide = blockEntity.getMaxSideBlocks();
+        if (blockEntity.getNorthBlocks() < maxSide) {
             int newValue = blockEntity.getNorthBlocks() + 1;
             blockEntity.setNorthBlocks(newValue);
         }
@@ -79,7 +81,8 @@ public class CoreMenu extends AbstractContainerMenu {
     }
 
     public void incrementSouthBlocks() {
-        if (blockEntity.getSouthBlocks() < MAX_SIDE) {
+        int maxSide = blockEntity.getMaxSideBlocks();
+        if (blockEntity.getSouthBlocks() < maxSide) {
             int newValue = blockEntity.getSouthBlocks() + 1;
             blockEntity.setSouthBlocks(newValue);
         }
@@ -93,7 +96,8 @@ public class CoreMenu extends AbstractContainerMenu {
     }
 
     public void incrementEastBlocks() {
-        if (blockEntity.getEastBlocks() < MAX_SIDE) {
+        int maxSide = blockEntity.getMaxSideBlocks();
+        if (blockEntity.getEastBlocks() < maxSide) {
             int newValue = blockEntity.getEastBlocks() + 1;
             blockEntity.setEastBlocks(newValue);
         }
@@ -107,7 +111,8 @@ public class CoreMenu extends AbstractContainerMenu {
     }
 
     public void incrementWestBlocks() {
-        if (blockEntity.getWestBlocks() < MAX_SIDE) {
+        int maxSide = blockEntity.getMaxSideBlocks();
+        if (blockEntity.getWestBlocks() < maxSide) {
             int newValue = blockEntity.getWestBlocks() + 1;
             blockEntity.setWestBlocks(newValue);
         }
