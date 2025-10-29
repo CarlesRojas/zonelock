@@ -40,6 +40,13 @@ public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
     private Button westPlusButton;
     private Button westMinusButton;
 
+    private static final int BUTTON_HOLD_DELAY = 500; // Initial delay before rapid increment (in milliseconds)
+    private static final int BUTTON_REPEAT_INTERVAL = 50; // Interval between increments while holding (in milliseconds)
+
+    private long buttonHoldStartTime = 0;
+    private long lastAutoPressTime = 0;
+    private Button heldButton = null;
+
     private int HALF_BUTTON = 5;
     private int TEXT_DISPL = 2;
     private int LABEL_DISPL_TOP = 7;
@@ -350,5 +357,89 @@ public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
         updateSouthButtonState();
         updateEastButtonState();
         updateWestButtonState();
+
+        if (heldButton != null) {
+            long currentTime = System.currentTimeMillis();
+            long holdDuration = currentTime - buttonHoldStartTime;
+            long timeSinceLastPress = currentTime - lastAutoPressTime;
+
+            if (holdDuration >= BUTTON_HOLD_DELAY && timeSinceLastPress >= BUTTON_REPEAT_INTERVAL)
+                handleButtonPress(heldButton);
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        Button clickedButton = getClickedButton(mouseX, mouseY);
+        if (clickedButton != null) {
+            heldButton = clickedButton;
+            buttonHoldStartTime = System.currentTimeMillis();
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        heldButton = null;
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    private Button getClickedButton(double mouseX, double mouseY) {
+        if (upPlusButton.isMouseOver(mouseX, mouseY))
+            return upPlusButton;
+        if (upMinusButton.isMouseOver(mouseX, mouseY))
+            return upMinusButton;
+        if (downPlusButton.isMouseOver(mouseX, mouseY))
+            return downPlusButton;
+        if (downMinusButton.isMouseOver(mouseX, mouseY))
+            return downMinusButton;
+        if (northPlusButton.isMouseOver(mouseX, mouseY))
+            return northPlusButton;
+        if (northMinusButton.isMouseOver(mouseX, mouseY))
+            return northMinusButton;
+        if (southPlusButton.isMouseOver(mouseX, mouseY))
+            return southPlusButton;
+        if (southMinusButton.isMouseOver(mouseX, mouseY))
+            return southMinusButton;
+        if (eastPlusButton.isMouseOver(mouseX, mouseY))
+            return eastPlusButton;
+        if (eastMinusButton.isMouseOver(mouseX, mouseY))
+            return eastMinusButton;
+        if (westPlusButton.isMouseOver(mouseX, mouseY))
+            return westPlusButton;
+        if (westMinusButton.isMouseOver(mouseX, mouseY))
+            return westMinusButton;
+        return null;
+    }
+
+    private void handleButtonPress(Button button) {
+        lastAutoPressTime = System.currentTimeMillis();
+        if (!button.active)
+            return;
+
+        if (button == upPlusButton)
+            menu.incrementUpBlocks();
+        else if (button == upMinusButton)
+            menu.decrementUpBlocks();
+        else if (button == downPlusButton)
+            menu.incrementDownBlocks();
+        else if (button == downMinusButton)
+            menu.decrementDownBlocks();
+        else if (button == northPlusButton)
+            menu.incrementNorthBlocks();
+        else if (button == northMinusButton)
+            menu.decrementNorthBlocks();
+        else if (button == southPlusButton)
+            menu.incrementSouthBlocks();
+        else if (button == southMinusButton)
+            menu.decrementSouthBlocks();
+        else if (button == eastPlusButton)
+            menu.incrementEastBlocks();
+        else if (button == eastMinusButton)
+            menu.decrementEastBlocks();
+        else if (button == westPlusButton)
+            menu.incrementWestBlocks();
+        else if (button == westMinusButton)
+            menu.decrementWestBlocks();
     }
 }
