@@ -50,6 +50,76 @@ public class CoreMenu extends AbstractContainerMenu {
         }
     }
 
+    public void incrementDownBlocks() {
+        if (blockEntity.getDownBlocks() < MAX_SIDE) {
+            int newValue = blockEntity.getDownBlocks() + 1;
+            blockEntity.setDownBlocks(newValue);
+        }
+    }
+
+    public void decrementDownBlocks() {
+        if (blockEntity.getDownBlocks() > MIN_SIDE) {
+            int newValue = blockEntity.getDownBlocks() - 1;
+            blockEntity.setDownBlocks(newValue);
+        }
+    }
+
+    public void incrementNorthBlocks() {
+        if (blockEntity.getNorthBlocks() < MAX_SIDE) {
+            int newValue = blockEntity.getNorthBlocks() + 1;
+            blockEntity.setNorthBlocks(newValue);
+        }
+    }
+
+    public void decrementNorthBlocks() {
+        if (blockEntity.getNorthBlocks() > MIN_SIDE) {
+            int newValue = blockEntity.getNorthBlocks() - 1;
+            blockEntity.setNorthBlocks(newValue);
+        }
+    }
+
+    public void incrementSouthBlocks() {
+        if (blockEntity.getSouthBlocks() < MAX_SIDE) {
+            int newValue = blockEntity.getSouthBlocks() + 1;
+            blockEntity.setSouthBlocks(newValue);
+        }
+    }
+
+    public void decrementSouthBlocks() {
+        if (blockEntity.getSouthBlocks() > MIN_SIDE) {
+            int newValue = blockEntity.getSouthBlocks() - 1;
+            blockEntity.setSouthBlocks(newValue);
+        }
+    }
+
+    public void incrementEastBlocks() {
+        if (blockEntity.getEastBlocks() < MAX_SIDE) {
+            int newValue = blockEntity.getEastBlocks() + 1;
+            blockEntity.setEastBlocks(newValue);
+        }
+    }
+
+    public void decrementEastBlocks() {
+        if (blockEntity.getEastBlocks() > MIN_SIDE) {
+            int newValue = blockEntity.getEastBlocks() - 1;
+            blockEntity.setEastBlocks(newValue);
+        }
+    }
+
+    public void incrementWestBlocks() {
+        if (blockEntity.getWestBlocks() < MAX_SIDE) {
+            int newValue = blockEntity.getWestBlocks() + 1;
+            blockEntity.setWestBlocks(newValue);
+        }
+    }
+
+    public void decrementWestBlocks() {
+        if (blockEntity.getWestBlocks() > MIN_SIDE) {
+            int newValue = blockEntity.getWestBlocks() - 1;
+            blockEntity.setWestBlocks(newValue);
+        }
+    }
+
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
     // must assign a slot number to each of the slots used by the GUI.
     // For this container, we can see both the tile inventory's slots as well as the
