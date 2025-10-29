@@ -81,6 +81,7 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
                 if (level instanceof ServerLevel serverLevel)
                     LockedZones.get(serverLevel).setActive(zonePos, hasItem);
 
+                resetBlockValues();
                 level.sendBlockUpdated(zonePos, getBlockState(), newState, 3);
             }
         }
@@ -271,6 +272,46 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
 
     public void setWestBlocks(int value) {
         setZoneDimensions(upBlocks, downBlocks, northBlocks, southBlocks, eastBlocks, value);
+    }
+
+    private void resetBlockValues() {
+        int maxSide = getMaxSideBlocks();
+        if (maxSide == 0)
+            return;
+
+        boolean needsUpdate = false;
+
+        if (upBlocks > maxSide) {
+            upBlocks = maxSide;
+            needsUpdate = true;
+        }
+        if (downBlocks > maxSide) {
+            downBlocks = maxSide;
+            needsUpdate = true;
+        }
+        if (northBlocks > maxSide) {
+            northBlocks = maxSide;
+            needsUpdate = true;
+        }
+        if (southBlocks > maxSide) {
+            southBlocks = maxSide;
+            needsUpdate = true;
+        }
+        if (eastBlocks > maxSide) {
+            eastBlocks = maxSide;
+            needsUpdate = true;
+        }
+        if (westBlocks > maxSide) {
+            westBlocks = maxSide;
+            needsUpdate = true;
+        }
+
+        if (needsUpdate && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+            LockedZones.get(serverLevel).updateZone(worldPosition, upBlocks, downBlocks, northBlocks, southBlocks,
+                    eastBlocks, westBlocks);
+            setChanged();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
     }
 
     @Override

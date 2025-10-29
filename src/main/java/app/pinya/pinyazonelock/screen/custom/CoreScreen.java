@@ -174,42 +174,42 @@ public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
         int currentValue = menu.blockEntity.getUpBlocks();
         int maxSide = menu.blockEntity.getMaxSideBlocks();
         upPlusButton.active = currentValue < maxSide;
-        upMinusButton.active = currentValue > CoreMenu.MIN_SIDE;
+        upMinusButton.active = currentValue > CoreMenu.MIN_SIDE && maxSide > 0;
     }
 
     private void updateDownButtonState() {
         int currentValue = menu.blockEntity.getDownBlocks();
         int maxSide = menu.blockEntity.getMaxSideBlocks();
         downPlusButton.active = currentValue < maxSide;
-        downMinusButton.active = currentValue > CoreMenu.MIN_SIDE;
+        downMinusButton.active = currentValue > CoreMenu.MIN_SIDE && maxSide > 0;
     }
 
     private void updateNorthButtonState() {
         int currentValue = menu.blockEntity.getNorthBlocks();
         int maxSide = menu.blockEntity.getMaxSideBlocks();
         northPlusButton.active = currentValue < maxSide;
-        northMinusButton.active = currentValue > CoreMenu.MIN_SIDE;
+        northMinusButton.active = currentValue > CoreMenu.MIN_SIDE && maxSide > 0;
     }
 
     private void updateSouthButtonState() {
         int currentValue = menu.blockEntity.getSouthBlocks();
         int maxSide = menu.blockEntity.getMaxSideBlocks();
         southPlusButton.active = currentValue < maxSide;
-        southMinusButton.active = currentValue > CoreMenu.MIN_SIDE;
+        southMinusButton.active = currentValue > CoreMenu.MIN_SIDE && maxSide > 0;
     }
 
     private void updateEastButtonState() {
         int currentValue = menu.blockEntity.getEastBlocks();
         int maxSide = menu.blockEntity.getMaxSideBlocks();
         eastPlusButton.active = currentValue < maxSide;
-        eastMinusButton.active = currentValue > CoreMenu.MIN_SIDE;
+        eastMinusButton.active = currentValue > CoreMenu.MIN_SIDE && maxSide > 0;
     }
 
     private void updateWestButtonState() {
         int currentValue = menu.blockEntity.getWestBlocks();
         int maxSide = menu.blockEntity.getMaxSideBlocks();
         westPlusButton.active = currentValue < maxSide;
-        westMinusButton.active = currentValue > CoreMenu.MIN_SIDE;
+        westMinusButton.active = currentValue > CoreMenu.MIN_SIDE && maxSide > 0;
     }
 
     @Override
@@ -320,5 +320,16 @@ public class CoreScreen extends AbstractContainerScreen<CoreMenu> {
         renderBackground(guiGraphics, mouseX, mouseY, partialTick);
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    @Override
+    public void containerTick() {
+        super.containerTick();
+        updateUpButtonState();
+        updateDownButtonState();
+        updateNorthButtonState();
+        updateSouthButtonState();
+        updateEastButtonState();
+        updateWestButtonState();
     }
 }
