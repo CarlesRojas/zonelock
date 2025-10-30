@@ -152,14 +152,17 @@ public class ZoneEvents {
 
     private static void showFeedback() {
         try {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.player == null)
+            Minecraft minecraft = Minecraft.getInstance();
+            Player player = minecraft.player;
+            if (player == null)
                 return;
 
-            mc.execute(() -> {
-                mc.player.displayClientMessage(
+            minecraft.execute(() -> {
+                player.displayClientMessage(
                         Component.translatable("msg.pinya.zonelock.blocked_place"), true);
-                mc.player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.6f, 0.6f);
+
+                // TODO update this sound
+                player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.6f, 0.6f);
             });
 
         } catch (Exception e) {

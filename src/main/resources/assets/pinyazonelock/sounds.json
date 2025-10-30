@@ -1,0 +1,18 @@
+{
+    "activate_zone": {
+        "subtitle": "sounds.pinyazonelock.activate_zone",
+        "sounds": [
+            {
+                "name": "pinyazonelock:activate_zone"
+            }
+        ]
+    },
+    "deactivate_zone": {
+        "subtitle": "sounds.pinyazonelock.deactivate_zone",
+        "sounds": [
+            {
+                "name": "pinyazonelock:deactivate_zone"
+            }
+        ]
+    }
+}

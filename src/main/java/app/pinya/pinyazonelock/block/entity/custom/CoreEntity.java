@@ -10,6 +10,7 @@ import app.pinya.pinyazonelock.block.entity.ModBlocksEntities;
 import app.pinya.pinyazonelock.networking.ModMessages;
 import app.pinya.pinyazonelock.networking.UpdateZoneDimensionsC2SPacket;
 import app.pinya.pinyazonelock.screen.custom.CoreMenu;
+import app.pinya.pinyazonelock.sound.ModSound;
 import app.pinya.pinyazonelock.world.LockedZones;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -20,6 +21,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -76,6 +78,8 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
                 BlockPos zonePos = getBlockPos();
 
                 BlockState newState = getBlockState().setValue(Core.ACTIVE, hasItem);
+                level.playSound(null, zonePos, hasItem ? ModSound.ACTIVATE_ZONE.get() : ModSound.DEACTIVATE_ZONE.get(),
+                        SoundSource.BLOCKS, 0.6f, 1f);
                 level.setBlockAndUpdate(zonePos, newState);
 
                 if (level instanceof ServerLevel serverLevel)

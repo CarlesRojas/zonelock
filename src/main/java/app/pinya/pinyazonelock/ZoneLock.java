@@ -8,6 +8,7 @@ import app.pinya.pinyazonelock.particle.ModParticles;
 import app.pinya.pinyazonelock.particle.ZoneParticle;
 import app.pinya.pinyazonelock.screen.ModMenuTypes;
 import app.pinya.pinyazonelock.screen.custom.CoreScreen;
+import app.pinya.pinyazonelock.sound.ModSound;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
@@ -42,6 +43,7 @@ public class ZoneLock {
         ModBlocksEntities.register(modEventBus);
         ModMenuTypes.register(modEventBus);
         ModParticles.register(modEventBus);
+        ModSound.register(modEventBus);
 
         modEventBus.addListener(this::addCreative);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
