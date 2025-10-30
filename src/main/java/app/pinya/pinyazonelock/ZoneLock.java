@@ -32,6 +32,7 @@ public class ZoneLock {
         MinecraftForge.EVENT_BUS.register(this);
 
         MinecraftForge.EVENT_BUS.register(app.pinya.pinyazonelock.events.ZoneEvents.class);
+        MinecraftForge.EVENT_BUS.register(app.pinya.pinyazonelock.events.ClientEventHandler.class);
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
