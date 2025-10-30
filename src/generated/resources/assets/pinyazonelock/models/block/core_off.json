@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:block/cube",
   "textures": {
-    "down": "pinyazonelock:block/down",
-    "east": "pinyazonelock:block/east",
-    "north": "pinyazonelock:block/north",
-    "south": "pinyazonelock:block/south",
-    "up": "pinyazonelock:block/up",
-    "west": "pinyazonelock:block/west"
+    "down": "pinyazonelock:block/core_off",
+    "east": "pinyazonelock:block/core_off_east",
+    "north": "pinyazonelock:block/core_off_north",
+    "south": "pinyazonelock:block/core_off_south",
+    "up": "pinyazonelock:block/core_off",
+    "west": "pinyazonelock:block/core_off_west"
   }
 }

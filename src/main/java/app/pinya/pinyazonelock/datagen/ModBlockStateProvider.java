@@ -22,21 +22,21 @@ public class ModBlockStateProvider extends BlockStateProvider {
     private void registerCoreBlock() {
         ModelFile coreOn = models().cube(
                 "core_on",
-                modLoc("block/down"),
-                modLoc("block/up"),
-                modLoc("block/north"),
-                modLoc("block/south"),
-                modLoc("block/east"),
-                modLoc("block/west"));
+                modLoc("block/core_on"),
+                modLoc("block/core_on"),
+                modLoc("block/core_on_north"),
+                modLoc("block/core_on_south"),
+                modLoc("block/core_on_east"),
+                modLoc("block/core_on_west"));
 
         ModelFile coreOff = models().cube(
                 "core_off",
-                modLoc("block/down"),
-                modLoc("block/up"),
-                modLoc("block/north"),
-                modLoc("block/south"),
-                modLoc("block/east"),
-                modLoc("block/west"));
+                modLoc("block/core_off"),
+                modLoc("block/core_off"),
+                modLoc("block/core_off_north"),
+                modLoc("block/core_off_south"),
+                modLoc("block/core_off_east"),
+                modLoc("block/core_off_west"));
 
         Block coreBlock = ModBlocks.ZONE_LOCK_CORE.get();
 
