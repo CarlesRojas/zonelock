@@ -82,6 +82,14 @@ public class Core extends BaseEntityBlock {
   }
 
   @Override
+  public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @org.jetbrains.annotations.Nullable net.minecraft.world.entity.LivingEntity pPlacer, ItemStack pStack) {
+    super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
+    if (!pLevel.isClientSide && pLevel.getBlockEntity(pPos) instanceof CoreEntity coreEntity) {
+      coreEntity.initialize();
+    }
+  }
+
+  @Override
   protected RenderShape getRenderShape(BlockState pState) {
     return RenderShape.MODEL;
   }

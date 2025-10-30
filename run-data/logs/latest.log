@@ -1,0 +1,36 @@
+[30Oct2025 16:06:17.584] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forge_userdev_data, --assetIndex, 17, --assetsDir, C:\Users\carle\.gradle\caches\forge_gradle\assets, --gameDir, ., --mod, pinyazonelock, --all, --output, C:\Users\carle\Repos\zonelock\src\generated\resources, --existing, C:\Users\carle\Repos\zonelock\src\main\resources]
+[30Oct2025 16:06:17.586] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: JVM identified as Eclipse Adoptium OpenJDK 64-Bit Server VM 21.0.8+9-LTS
+[30Oct2025 16:06:17.588] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.2.1 starting: java version 21.0.8 by Eclipse Adoptium; OS Windows 11 arch amd64 version 10.0
+[30Oct2025 16:06:17.672] [main/WARN] [net.minecraftforge.fml.loading.FMLConfig/CORE]: Configuration file C:\Users\carle\Repos\zonelock\run-data\config\fml.toml is not correct. Correcting
+[30Oct2025 16:06:17.673] [main/INFO] [net.minecraftforge.fml.loading.FMLConfig/CORE]: Incorrect key [earlyWindowSkipGLVersions] was corrected from null to []
+[30Oct2025 16:06:17.673] [main/INFO] [net.minecraftforge.fml.loading.FMLConfig/CORE]: Incorrect key [earlyWindowLogHelpMessage] was corrected from null to true
+[30Oct2025 16:06:17.673] [main/INFO] [net.minecraftforge.fml.loading.FMLConfig/CORE]: Incorrect key [earlyWindowSquir] was corrected from null to false
+[30Oct2025 16:06:17.674] [main/INFO] [net.minecraftforge.fml.loading.FMLConfig/CORE]: Incorrect key [earlyWindowShowCPU] was corrected from null to false
+[30Oct2025 16:06:17.680] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forge_userdev_data
+[30Oct2025 16:06:17.749] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.7 Source=jar:file:///C:/Users/carle/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.7/8ab114ac385e6dbdad5efafe28aba4df8120915f/mixin-0.8.7.jar!/ Service=ModLauncher Env=UNKNOWN
+[30Oct2025 16:06:18.389] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
+[30Oct2025 16:06:18.934] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forge_userdev_data' with arguments [--gameDir, ., --assetsDir, C:\Users\carle\.gradle\caches\forge_gradle\assets, --assetIndex, 17, --mod, pinyazonelock, --all, --output, C:\Users\carle\Repos\zonelock\src\generated\resources, --existing, C:\Users\carle\Repos\zonelock\src\main\resources]
+[30Oct2025 16:06:22.735] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 51.0.33, for MC 1.21 with MCP 20240613.102039
+[30Oct2025 16:06:22.735] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v51.0.33 Initialized
+[30Oct2025 16:06:22.755] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Opening jdk.naming.dns/com.sun.jndi.dns to java.naming
+[30Oct2025 16:06:23.120] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [pinyazonelock]
+[30Oct2025 16:06:23.174] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/carle/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.21-51.0.33_mapped_parchment_2024.11.17-1.21.1/forge-1.21-51.0.33_mapped_parchment_2024.11.17-1.21.1-recomp.jar%230!/assets/.mcassetsroot' uses unexpected schema
+[30Oct2025 16:06:23.174] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/carle/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.21-51.0.33_mapped_parchment_2024.11.17-1.21.1/forge-1.21-51.0.33_mapped_parchment_2024.11.17-1.21.1-recomp.jar%230!/data/.mcassetsroot' uses unexpected schema
+[30Oct2025 16:06:23.294] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
+[30Oct2025 16:06:23.407] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 111 ms
+[30Oct2025 16:06:23.407] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
+[30Oct2025 16:06:23.426] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 19 ms
+[30Oct2025 16:06:23.427] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id pinyazonelock
+[30Oct2025 16:06:23.432] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id pinyazonelock finished after 6 ms
+[30Oct2025 16:06:23.432] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id pinyazonelock
+[30Oct2025 16:06:23.433] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id pinyazonelock finished after 0 ms
+[30Oct2025 16:06:23.433] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: pinyazonelock
+[30Oct2025 16:06:23.433] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: pinyazonelock finished after 0 ms
+[30Oct2025 16:06:23.433] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: pinyazonelock
+[30Oct2025 16:06:23.548] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: pinyazonelock finished after 114 ms
+[30Oct2025 16:06:23.548] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Registries
+[30Oct2025 16:06:23.553] [main/INFO] [net.minecraft.data.DataGenerator/]: Registries finished after 5 ms
+[30Oct2025 16:06:23.553] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Global Loot Modifiers : pinyazonelock
+[30Oct2025 16:06:23.555] [main/INFO] [net.minecraft.data.DataGenerator/]: Global Loot Modifiers : pinyazonelock finished after 1 ms
+[30Oct2025 16:06:23.555] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 260 ms
+[30Oct2025 16:06:23.557] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 12, old count: 12, new count: 13, removed stale: 0, written: 3

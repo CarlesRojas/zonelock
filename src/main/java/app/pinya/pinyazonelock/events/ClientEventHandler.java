@@ -37,8 +37,6 @@ public class ClientEventHandler {
 
         particleTimer = 0;
 
-        LOGGER.info("Client tick");
-
         Minecraft minecraft = Minecraft.getInstance();
         Player player = minecraft.player;
 

@@ -124,11 +124,14 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public void onLoad() {
+        LOGGER.info("Loading CoreEntity at {} isClientSide: {}", worldPosition, level.isClientSide);
         if (!level.isClientSide)
             initialize();
     }
 
     public void initialize() {
+        LOGGER.info("Initializing CoreEntity at {}, initialized: {}, isServer {}", worldPosition, initialized,
+                !level.isClientSide && level instanceof ServerLevel sLevel);
         if (initialized)
             return;
 
@@ -140,10 +143,11 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
             BlockState state = getBlockState();
 
             LockedZones lockedZones = LockedZones.get(sLevel);
+
             lockedZones.addZone(zonePos, upBlocks, downBlocks, northBlocks, southBlocks, eastBlocks, westBlocks);
 
-            boolean hasItem = level.getBlockEntity(zonePos) instanceof CoreEntity coreEntity
-                    && !coreEntity.inventory.getStackInSlot(0).isEmpty();
+            boolean hasItem = !inventory.getStackInSlot(0).isEmpty();
+            LOGGER.info("IS SERVER, SET ZONE ACTIVE {} {}", zonePos, hasItem);
 
             lockedZones.setActive(zonePos, hasItem);
             level.setBlockAndUpdate(zonePos, state.setValue(Core.ACTIVE, hasItem));
