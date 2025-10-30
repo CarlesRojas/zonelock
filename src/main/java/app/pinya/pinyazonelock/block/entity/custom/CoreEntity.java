@@ -31,6 +31,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
@@ -39,7 +40,8 @@ import net.minecraftforge.network.PacketDistributor;
 public class CoreEntity extends BlockEntity implements MenuProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(Core.class);
 
-    // Zone dimensions
+    private Rotation rotation = Rotation.NONE;
+
     private int northBlocks = 8;
     private int southBlocks = 8;
     private int eastBlocks = 8;
@@ -92,6 +94,7 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
 
     public CoreEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlocksEntities.ZONE_LOCK_CORE_ENTITY.get(), pPos, pBlockState);
+        this.rotation = pBlockState.getValue(Core.ROTATION);
     }
 
     public void clearContents() {
@@ -140,6 +143,9 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
             lockedZones.setActive(zonePos, hasItem);
             level.setBlockAndUpdate(zonePos, state.setValue(Core.ACTIVE, hasItem));
             setChanged();
+
+            if (rotation != Rotation.NONE)
+                handleRotation(rotation, zonePos);
         }
     }
 
@@ -335,4 +341,45 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
+    public void handleRotation(Rotation rotation, BlockPos zonePos) {
+        if (level != null && level instanceof ServerLevel serverLevel) {
+            LOGGER.info("CoreEntity handling rotation: " + rotation);
+
+            int newNorth, newSouth, newEast, newWest;
+
+            switch (rotation) {
+                case CLOCKWISE_90 -> {
+                    newNorth = westBlocks;
+                    newSouth = eastBlocks;
+                    newEast = northBlocks;
+                    newWest = southBlocks;
+                }
+                case CLOCKWISE_180 -> {
+                    newNorth = southBlocks;
+                    newSouth = northBlocks;
+                    newEast = westBlocks;
+                    newWest = eastBlocks;
+                }
+                case COUNTERCLOCKWISE_90 -> {
+                    newNorth = eastBlocks;
+                    newSouth = westBlocks;
+                    newEast = southBlocks;
+                    newWest = northBlocks;
+                }
+                default -> {
+                    newNorth = northBlocks;
+                    newSouth = southBlocks;
+                    newEast = eastBlocks;
+                    newWest = westBlocks;
+                }
+            }
+
+            serverLevel.setBlockAndUpdate(zonePos, getBlockState().setValue(Core.ROTATION, Rotation.NONE));
+            rotation = Rotation.NONE;
+            setZoneDimensionsServer(upBlocks, downBlocks, newNorth, newSouth, newEast, newWest);
+            setChanged();
+        }
+    }
+
 }

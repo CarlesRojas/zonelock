@@ -1,6 +1,8 @@
 package app.pinya.pinyazonelock.block.custom;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mojang.serialization.MapCodec;
 
@@ -19,15 +21,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class Core extends BaseEntityBlock {
+  private static final Logger LOGGER = LoggerFactory.getLogger(LockedZones.class);
   public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
   public static final MapCodec<Core> CODEC = simpleCodec(Core::new);
+  public static final EnumProperty<Rotation> ROTATION = EnumProperty.create("rotation", Rotation.class);
 
   public Core(Properties properties) {
     super(properties);
@@ -36,6 +42,7 @@ public class Core extends BaseEntityBlock {
 
   @Override
   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+    pBuilder.add(ROTATION);
     pBuilder.add(ACTIVE);
   }
 
@@ -82,7 +89,8 @@ public class Core extends BaseEntityBlock {
   }
 
   @Override
-  public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @org.jetbrains.annotations.Nullable net.minecraft.world.entity.LivingEntity pPlacer, ItemStack pStack) {
+  public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState,
+      @org.jetbrains.annotations.Nullable net.minecraft.world.entity.LivingEntity pPlacer, ItemStack pStack) {
     super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
     if (!pLevel.isClientSide && pLevel.getBlockEntity(pPos) instanceof CoreEntity coreEntity) {
       coreEntity.initialize();
@@ -98,4 +106,10 @@ public class Core extends BaseEntityBlock {
   protected MapCodec<? extends BaseEntityBlock> codec() {
     return CODEC;
   }
+
+  @Override
+  protected BlockState rotate(BlockState pState, Rotation pRot) {
+    return pState.setValue(ROTATION, pRot);
+  }
+
 }

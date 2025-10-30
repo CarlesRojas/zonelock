@@ -1,5 +1,5 @@
-// 1.21	2025-10-28T16:23:54.3661602	Block States: pinyazonelock
+// 1.21	2025-10-30T19:43:43.4341926	Block States: pinyazonelock
 0790886a9376994214966e92e5cf3e01325e941a assets/pinyazonelock/blockstates/core.json
-cc7d88fc432aabc9e080cc1e7bd154010e2b1f9f assets/pinyazonelock/models/block/core_off.json
-9e347c9dcfe8f1a3c16cb745cb02f1add4b3cf0a assets/pinyazonelock/models/block/core_on.json
+e96342e820e9e21c2e23a7f99805bf0a9b81cf02 assets/pinyazonelock/models/block/core_off.json
+e96342e820e9e21c2e23a7f99805bf0a9b81cf02 assets/pinyazonelock/models/block/core_on.json
 852db89727938c2d4eb98a8ca32513dd604e8402 assets/pinyazonelock/models/item/core.json
