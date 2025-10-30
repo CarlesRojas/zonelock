@@ -4,6 +4,7 @@ import app.pinya.pinyazonelock.block.ModBlocks;
 import app.pinya.pinyazonelock.block.entity.ModBlocksEntities;
 import app.pinya.pinyazonelock.item.ModItems;
 import app.pinya.pinyazonelock.networking.ModMessages;
+import app.pinya.pinyazonelock.particle.ModParticles;
 import app.pinya.pinyazonelock.screen.ModMenuTypes;
 import app.pinya.pinyazonelock.screen.custom.CoreScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -38,6 +39,7 @@ public class ZoneLock {
         ModBlocks.register(modEventBus);
         ModBlocksEntities.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+        ModParticles.register(modEventBus);
 
         modEventBus.addListener(this::addCreative);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);

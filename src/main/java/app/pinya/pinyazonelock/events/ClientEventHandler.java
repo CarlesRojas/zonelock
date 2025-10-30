@@ -4,11 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import app.pinya.pinyazonelock.block.custom.Core;
+import app.pinya.pinyazonelock.particle.ModParticles;
 import app.pinya.pinyazonelock.world.ClientLockedZones;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
@@ -21,10 +21,28 @@ public class ClientEventHandler {
     private static final double STEP = 0.25;
     private static final int RENDER_RADIUS = 48;
 
+    // Purple color with alpha for transparency (R=0.5, G=0, B=1.0)
+    // private static final Vec3 PARTICLE_COLOR = new Vec3(0.5, 0, 1.0);
+    // private static final float PARTICLE_SIZE = 0.25f;
+    // private static final DustParticleOptions PARTICLE_OPTIONS = new
+    // DustParticleOptions(
+    // new Vector3f((float) PARTICLE_COLOR.x, (float) PARTICLE_COLOR.y, (float)
+    // PARTICLE_COLOR.z),
+    // PARTICLE_SIZE);
+
+    private static final int PARTICLE_SPAWN_INTERVAL = 20; // 20 ticks = 1 second
+    private static int particleTimer = 0;
+
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent e) {
-        if (e.phase != TickEvent.Phase.END)
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END)
             return;
+
+        particleTimer++;
+        if (particleTimer < PARTICLE_SPAWN_INTERVAL)
+            return;
+
+        particleTimer = 0;
 
         LOGGER.info("Client tick");
 
@@ -89,7 +107,7 @@ public class ClientEventHandler {
                 y = max.y;
                 for (double dx = min.x; dx <= max.x; dx += STEP) {
                     for (double dz = min.z; dz <= max.z; dz += STEP) {
-                        level.addParticle(ParticleTypes.END_ROD, dx, y, dz, 0, 0, 0);
+                        level.addParticle(ModParticles.ZONE.get(), dx, y, dz, 0, 0, 0);
                     }
                 }
             }
@@ -97,7 +115,7 @@ public class ClientEventHandler {
                 y = min.y;
                 for (double dx = min.x; dx <= max.x; dx += STEP) {
                     for (double dz = min.z; dz <= max.z; dz += STEP) {
-                        level.addParticle(ParticleTypes.END_ROD, dx, y, dz, 0, 0, 0);
+                        level.addParticle(ModParticles.ZONE.get(), dx, y, dz, 0, 0, 0);
                     }
                 }
             }
@@ -105,7 +123,7 @@ public class ClientEventHandler {
                 z = min.z;
                 for (double dx = min.x; dx <= max.x; dx += STEP) {
                     for (double dy = min.y; dy <= max.y; dy += STEP) {
-                        level.addParticle(ParticleTypes.END_ROD, dx, dy, z, 0, 0, 0);
+                        level.addParticle(ModParticles.ZONE.get(), dx, dy, z, 0, 0, 0);
                     }
                 }
             }
@@ -113,7 +131,7 @@ public class ClientEventHandler {
                 z = max.z;
                 for (double dx = min.x; dx <= max.x; dx += STEP) {
                     for (double dy = min.y; dy <= max.y; dy += STEP) {
-                        level.addParticle(ParticleTypes.END_ROD, dx, dy, z, 0, 0, 0);
+                        level.addParticle(ModParticles.ZONE.get(), dx, dy, z, 0, 0, 0);
                     }
                 }
             }
@@ -121,7 +139,7 @@ public class ClientEventHandler {
                 x = min.x;
                 for (double dz = min.z; dz <= max.z; dz += STEP) {
                     for (double dy = min.y; dy <= max.y; dy += STEP) {
-                        level.addParticle(ParticleTypes.END_ROD, x, dy, dz, 0, 0, 0);
+                        level.addParticle(ModParticles.ZONE.get(), x, dy, dz, 0, 0, 0);
                     }
                 }
             }
@@ -129,7 +147,7 @@ public class ClientEventHandler {
                 x = max.x;
                 for (double dz = min.z; dz <= max.z; dz += STEP) {
                     for (double dy = min.y; dy <= max.y; dy += STEP) {
-                        level.addParticle(ParticleTypes.END_ROD, x, dy, dz, 0, 0, 0);
+                        level.addParticle(ModParticles.ZONE.get(), x, dy, dz, 0, 0, 0);
                     }
                 }
             }
