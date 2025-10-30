@@ -60,6 +60,10 @@ public class LockedZones extends SavedData {
         return zones.values().stream().filter(z -> z.center().equals(center)).findFirst();
     }
 
+    public boolean hasZoneAt(BlockPos center) {
+        return getZone(center).isPresent();
+    }
+
     public List<Zone> getZonesAffecting(BlockPos pos) {
         if (zones.isEmpty())
             return List.of();

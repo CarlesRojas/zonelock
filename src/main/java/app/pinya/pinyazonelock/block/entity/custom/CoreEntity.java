@@ -38,7 +38,6 @@ import net.minecraftforge.network.PacketDistributor;
 
 public class CoreEntity extends BlockEntity implements MenuProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(Core.class);
-    private boolean initialized = false;
 
     // Zone dimensions
     private int northBlocks = 8;
@@ -124,33 +123,23 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public void onLoad() {
-        LOGGER.info("Loading CoreEntity at {} isClientSide: {}", worldPosition, level.isClientSide);
         if (!level.isClientSide)
             initialize();
     }
 
     public void initialize() {
-        LOGGER.info("Initializing CoreEntity at {}, initialized: {}, isServer {}", worldPosition, initialized,
-                !level.isClientSide && level instanceof ServerLevel sLevel);
-        if (initialized)
-            return;
-
-        initialized = true;
-        setChanged();
-
         if (!level.isClientSide && level instanceof ServerLevel sLevel) {
             BlockPos zonePos = getBlockPos();
             BlockState state = getBlockState();
-
             LockedZones lockedZones = LockedZones.get(sLevel);
 
-            lockedZones.addZone(zonePos, upBlocks, downBlocks, northBlocks, southBlocks, eastBlocks, westBlocks);
+            if (!lockedZones.hasZoneAt(zonePos))
+                lockedZones.addZone(zonePos, upBlocks, downBlocks, northBlocks, southBlocks, eastBlocks, westBlocks);
 
             boolean hasItem = !inventory.getStackInSlot(0).isEmpty();
-            LOGGER.info("IS SERVER, SET ZONE ACTIVE {} {}", zonePos, hasItem);
-
             lockedZones.setActive(zonePos, hasItem);
             level.setBlockAndUpdate(zonePos, state.setValue(Core.ACTIVE, hasItem));
+            setChanged();
         }
     }
 
@@ -158,7 +147,6 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
     protected void saveAdditional(CompoundTag pTag, Provider pRegistries) {
         super.saveAdditional(pTag, pRegistries);
         pTag.put("inventory", inventory.serializeNBT(pRegistries));
-        pTag.putBoolean("initialized", initialized);
 
         pTag.putInt("upBlocks", upBlocks);
         pTag.putInt("downBlocks", downBlocks);
@@ -172,7 +160,6 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
     protected void loadAdditional(CompoundTag pTag, Provider pRegistries) {
         super.loadAdditional(pTag, pRegistries);
         inventory.deserializeNBT(pRegistries, pTag.getCompound("inventory"));
-        initialized = pTag.getBoolean("initialized");
 
         upBlocks = pTag.getInt("upBlocks");
         downBlocks = pTag.getInt("downBlocks");
