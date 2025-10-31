@@ -51,9 +51,9 @@ public class CoreEntity extends BlockEntity implements MenuProvider {
 
     public static final int MAX_SIDE_IRON = 8;
     public static final int MAX_SIDE_GOLD = 16;
-    public static final int MAX_SIDE_EMERALD = 32;
-    public static final int MAX_SIDE_LAPIS = 48;
-    public static final int MAX_SIDE_DIAMOND = 64;
+    public static final int MAX_SIDE_EMERALD = 24;
+    public static final int MAX_SIDE_LAPIS = 32;
+    public static final int MAX_SIDE_DIAMOND = 40;
 
     public final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
