@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -21,6 +22,7 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -114,8 +116,11 @@ public class ZoneEvents {
 
         BlockPos pos = event.getPos();
         BlockState state = event.getLevel().getBlockState(pos);
+        BlockEntity entity = event.getLevel().getBlockEntity(pos);
         Level level = event.getLevel();
-        if (hasMenu(level, pos, state)) {
+
+        // TODO let interaction with doors, trapdoors, etc...
+        if (!player.isShiftKeyDown() && (hasMenu(level, pos, state) || entity instanceof Container)) {
             event.setUseItem(Event.Result.DENY);
             return;
         }
