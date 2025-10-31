@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import app.pinya.pinyazonelock.ZoneLock;
 import app.pinya.pinyazonelock.block.ModBlocks;
+import app.pinya.pinyazonelock.sound.ModSound;
 import app.pinya.pinyazonelock.world.ClientLockedZones;
 import app.pinya.pinyazonelock.world.LockedZones;
 import net.minecraft.client.Minecraft;
@@ -12,7 +13,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -162,7 +162,7 @@ public class ZoneEvents {
                         Component.translatable("msg.pinya.zonelock.blocked_place"), true);
 
                 // TODO update this sound
-                player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.6f, 0.6f);
+                player.playSound(ModSound.LOCKED.get(), 0.6f, 0.6f);
             });
 
         } catch (Exception e) {

@@ -24,7 +24,7 @@ public class ModBlocks {
           BlockBehaviour.Properties.of()
               .strength(4f)
               .lightLevel(state -> state.getValue(Core.ACTIVE) ? 10 : 0)
-              .sound(SoundType.DEEPSLATE_TILES))); // TODO change sound
+              .sound(SoundType.DEEPSLATE_TILES)));
 
   private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
     RegistryObject<T> toReturn = BLOCKS.register(name, block);

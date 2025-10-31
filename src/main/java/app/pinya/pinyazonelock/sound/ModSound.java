@@ -14,6 +14,7 @@ public class ModSound {
 
     public static final RegistryObject<SoundEvent> ACTIVATE_ZONE = registerSoundEvent("activate_zone");
     public static final RegistryObject<SoundEvent> DEACTIVATE_ZONE = registerSoundEvent("deactivate_zone");
+    public static final RegistryObject<SoundEvent> LOCKED = registerSoundEvent("locked");
 
     public static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUNDS.register(name, () -> SoundEvent

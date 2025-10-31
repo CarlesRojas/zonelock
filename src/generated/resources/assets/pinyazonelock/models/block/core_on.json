@@ -4,6 +4,7 @@
     "down": "pinyazonelock:block/core_on",
     "east": "pinyazonelock:block/core_on_east",
     "north": "pinyazonelock:block/core_on_north",
+    "particle": "pinyazonelock:block/core_on",
     "south": "pinyazonelock:block/core_on_south",
     "up": "pinyazonelock:block/core_on",
     "west": "pinyazonelock:block/core_on_west"

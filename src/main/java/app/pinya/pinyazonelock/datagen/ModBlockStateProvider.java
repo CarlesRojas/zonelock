@@ -27,7 +27,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 modLoc("block/core_on_north"),
                 modLoc("block/core_on_south"),
                 modLoc("block/core_on_east"),
-                modLoc("block/core_on_west"));
+                modLoc("block/core_on_west")).texture("particle", modLoc("block/core_on"));
 
         ModelFile coreOff = models().cube(
                 "core_off",
@@ -36,7 +36,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 modLoc("block/core_off_north"),
                 modLoc("block/core_off_south"),
                 modLoc("block/core_off_east"),
-                modLoc("block/core_off_west"));
+                modLoc("block/core_off_west")).texture("particle", modLoc("block/core_off"));
 
         Block coreBlock = ModBlocks.ZONE_LOCK_CORE.get();
 

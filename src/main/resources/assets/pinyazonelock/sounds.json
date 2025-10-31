@@ -14,5 +14,13 @@
                 "name": "pinyazonelock:deactivate_zone"
             }
         ]
+    },
+    "locked": {
+        "subtitle": "sounds.pinyazonelock.locked",
+        "sounds": [
+            {
+                "name": "pinyazonelock:locked"
+            }
+        ]
     }
 }
