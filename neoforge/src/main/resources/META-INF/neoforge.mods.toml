@@ -1,5 +1,5 @@
 license = "${license}"
-issueTrackerURL = "https://github.com/CarlesRojas/mc-firstmod/issues"
+issueTrackerURL = "https://github.com/CarlesRojas/zonelock/issues"
 
 [[mods]]
 modId = "${mod_id}"

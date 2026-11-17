@@ -9,8 +9,8 @@
     ],
     "contact": {
         "homepage": "https://modrinth.com/mod/zonelock",
-        "sources": "https://github.com/CarlesRojas/mc-firstmod",
-        "issues": "https://github.com/CarlesRojas/mc-firstmod/issues"
+        "sources": "https://github.com/CarlesRojas/zonelock",
+        "issues": "https://github.com/CarlesRojas/zonelock/issues"
     },
     "license": "${license}",
     "icon": "assets/zonelock/icon.png",
