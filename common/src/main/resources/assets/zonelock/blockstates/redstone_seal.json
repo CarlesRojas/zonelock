@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "lit=true,powered=true": {
+      "model": "zonelock:block/amethyst_seal_redstone_lit_powered"
+    },
+    "lit=true,powered=false": {
+      "model": "zonelock:block/amethyst_seal_redstone_lit"
+    },
+    "lit=false,powered=true": {
+      "model": "zonelock:block/amethyst_seal_redstone_unlit_powered"
+    },
+    "lit=false,powered=false": {
+      "model": "zonelock:block/amethyst_seal_redstone_unlit"
+    }
+  }
+}

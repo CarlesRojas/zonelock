@@ -1,0 +1,9 @@
+{
+  "parent": "zonelock:block/amethyst_seal_template_out",
+  "textures": {
+    "side": "zonelock:block/amethyst_seal_side_touch_unlit",
+    "top": "zonelock:block/amethyst_seal_top_touch_unlit",
+    "bottom": "zonelock:block/amethyst_core_bottom",
+    "cap": "zonelock:block/amethyst_seal_cap_unlit"
+  }
+}

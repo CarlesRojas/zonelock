@@ -1,0 +1,40 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "armed": "true",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "zonelock:block/redstone_core_armed_powered"
+      }
+    },
+    {
+      "when": {
+        "armed": "true",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "zonelock:block/redstone_core_armed"
+      }
+    },
+    {
+      "when": {
+        "armed": "false",
+        "powered": "true"
+      },
+      "apply": {
+        "model": "zonelock:block/redstone_core_unarmed_powered"
+      }
+    },
+    {
+      "when": {
+        "armed": "false",
+        "powered": "false"
+      },
+      "apply": {
+        "model": "zonelock:block/redstone_core_unarmed"
+      }
+    }
+  ]
+}

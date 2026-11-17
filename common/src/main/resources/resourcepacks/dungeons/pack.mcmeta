@@ -1,0 +1,10 @@
+{
+  "pack": {
+    "description": {
+      "translate": "pack.zonelock.dungeons.description",
+      "fallback": "Hidden dungeons sealed by Amethyst Cores"
+    },
+    "min_format": 121,
+    "max_format": 121
+  }
+}

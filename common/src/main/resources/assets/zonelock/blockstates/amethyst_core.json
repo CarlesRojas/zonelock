@@ -1,0 +1,20 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "armed": "true"
+      },
+      "apply": {
+        "model": "zonelock:block/amethyst_core_armed"
+      }
+    },
+    {
+      "when": {
+        "armed": "false"
+      },
+      "apply": {
+        "model": "zonelock:block/amethyst_core_unarmed"
+      }
+    }
+  ]
+}

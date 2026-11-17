@@ -1,0 +1,29 @@
+license = "${license}"
+issueTrackerURL = "https://github.com/CarlesRojas/mc-firstmod/issues"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${version}"
+displayName = "${mod_name}"
+displayURL = "https://modrinth.com/mod/zonelock"
+iconFile = "assets/zonelock/icon.png"
+credits = "${credits}"
+authors = "${mod_author}"
+description = '''${description}'''
+
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neoforge_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"

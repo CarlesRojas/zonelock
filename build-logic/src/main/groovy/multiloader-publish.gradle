@@ -1,0 +1,60 @@
+// Release publishing for a loader project. Tokens come from environment variables (GitHub Actions secrets):
+//   MODRINTH_TOKEN, CURSEFORGE_TOKEN, GITHUB_TOKEN
+// Without tokens the task runs as a dry run, so `./gradlew publishMods` is always safe to try locally.
+plugins {
+    id 'me.modmuss50.mod-publish-plugin'
+}
+
+def loader = project.name // "fabric" or "neoforge"
+def loaderLabel = loader == 'fabric' ? 'Fabric' : 'NeoForge'
+def modVersion = project.version.toString()
+def mcVersion = project.property('minecraft_version').toString()
+def modName = project.property('mod_name').toString()
+def modrinthToken = providers.environmentVariable('MODRINTH_TOKEN')
+def curseforgeToken = providers.environmentVariable('CURSEFORGE_TOKEN')
+def githubToken = providers.environmentVariable('GITHUB_TOKEN')
+
+publishMods {
+    file = tasks.named('jar').flatMap { it.archiveFile }
+    displayName = "${modName} ${modVersion} (${loaderLabel} ${mcVersion})"
+    version = "${modVersion}+${loader}-${mcVersion}"
+    changelog = rootProject.file('CHANGELOG.md').exists() ? rootProject.file('CHANGELOG.md').text : ''
+    type = STABLE
+    modLoaders.add(loader)
+    dryRun = !modrinthToken.isPresent() && !curseforgeToken.isPresent()
+
+    if (project.hasProperty('modrinth_id')) {
+        modrinth {
+            accessToken = modrinthToken
+            projectId = project.property('modrinth_id')
+            minecraftVersions.add(mcVersion)
+            if (loader == 'fabric')
+                requires('fabric-api')
+        }
+    }
+    if (project.hasProperty('curseforge_id')) {
+        curseforge {
+            accessToken = curseforgeToken
+            projectId = project.property('curseforge_id')
+            minecraftVersions.add(mcVersion)
+            javaVersions.add(JavaVersion.toVersion(java_version))
+            clientRequired = true
+            serverRequired = true
+            if (loader == 'fabric')
+                requires('fabric-api')
+        }
+    }
+    if (project.hasProperty('github_repository')) {
+        github {
+            accessToken = githubToken
+            if (loader == 'fabric') {
+                // One GitHub release for both loaders: Fabric creates it, NeoForge adds its jar to it.
+                repository = project.property('github_repository')
+                commitish = 'main'
+                tagName = "v${modVersion}"
+            } else {
+                parent(project(':fabric').tasks.named('publishGithub'))
+            }
+        }
+    }
+}

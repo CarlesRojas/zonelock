@@ -1,0 +1,37 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "app.pinya.zonelock.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "BlockItemMixin",
+    "BoatItemMixin",
+    "BucketItemMixin",
+    "DecorationMixin",
+    "DispenserBlockMixin",
+    "EndermanTakeBlockGoalMixin",
+    "FarmlandBlockMixin",
+    "FireBlockMixin",
+    "FlowingFluidMixin",
+    "ItemStackMixin",
+    "LavaFluidMixin",
+    "LevelMixin",
+    "LivingEntityMixin",
+    "PistonStructureResolverMixin",
+    "PlayerMixin",
+    "ProjectileMixin",
+    "ServerExplosionMixin",
+    "ServerLevelMixin",
+    "ThrownEnderpearlMixin",
+    "TntBlockMixin",
+    "TridentItemMixin",
+    "TurtleEggBlockMixin"
+  ],
+  "client": [
+    "client.AbstractContainerScreenAccessor",
+    "client.InventoryScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

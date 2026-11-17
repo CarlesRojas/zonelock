@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 1466093287,
+    "separation": 28,
+    "spacing": 64
+  },
+  "structures": [
+    {
+      "structure": "zonelock:amethyst_tower",
+      "weight": 1
+    }
+  ]
+}

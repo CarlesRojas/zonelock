@@ -1,0 +1,10 @@
+{
+  "parent": "zonelock:block/amethyst_seal_template",
+  "textures": {
+    "side": "zonelock:block/amethyst_seal_side_redstone_lit",
+    "top": "zonelock:block/amethyst_seal_top_redstone_lit",
+    "bottom": "zonelock:block/amethyst_core_bottom",
+    "crystal": "minecraft:block/large_amethyst_bud",
+    "cap": "zonelock:block/amethyst_seal_cap_lit"
+  }
+}

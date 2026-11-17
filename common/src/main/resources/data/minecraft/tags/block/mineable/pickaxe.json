@@ -1,0 +1,8 @@
+{
+  "values": [
+    "zonelock:amethyst_core",
+    "zonelock:amethyst_seal",
+    "zonelock:redstone_seal",
+    "zonelock:redstone_core"
+  ]
+}

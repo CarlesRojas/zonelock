@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "  A",
+    " G ",
+    "G  "
+  ],
+  "key": {
+    "A": "minecraft:amethyst_shard",
+    "G": "minecraft:gold_ingot"
+  },
+  "result": {
+    "id": "zonelock:resonance_wand"
+  }
+}

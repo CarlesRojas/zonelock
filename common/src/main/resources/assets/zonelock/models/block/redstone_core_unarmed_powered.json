@@ -1,0 +1,9 @@
+{
+  "parent": "zonelock:block/amethyst_core_template",
+  "textures": {
+    "side": "zonelock:block/redstone_core_side_off_powered",
+    "top": "zonelock:block/redstone_core_top_off",
+    "bottom": "zonelock:block/amethyst_core_bottom",
+    "ledge": "zonelock:block/amethyst_core_ledge"
+  }
+}

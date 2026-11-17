@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " A ",
+    "GCG",
+    "BBB"
+  ],
+  "key": {
+    "A": "minecraft:amethyst_shard",
+    "G": "minecraft:gold_ingot",
+    "C": "minecraft:amethyst_block",
+    "B": [
+      "minecraft:blackstone",
+      "minecraft:polished_blackstone",
+      "minecraft:cobbled_deepslate",
+      "minecraft:polished_deepslate"
+    ]
+  },
+  "result": {
+    "id": "zonelock:amethyst_core"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " A ",
+    "GBG"
+  ],
+  "key": {
+    "A": "minecraft:amethyst_shard",
+    "G": "minecraft:gold_ingot",
+    "B": [
+      "minecraft:blackstone",
+      "minecraft:polished_blackstone",
+      "minecraft:cobbled_deepslate",
+      "minecraft:polished_deepslate"
+    ]
+  },
+  "result": {
+    "id": "zonelock:amethyst_seal",
+    "count": 2
+  }
+}

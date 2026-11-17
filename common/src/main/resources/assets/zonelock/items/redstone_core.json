@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "zonelock:block/redstone_core_unarmed"
+  }
+}

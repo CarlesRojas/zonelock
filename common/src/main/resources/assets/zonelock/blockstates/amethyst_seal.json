@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=true": {
+      "model": "zonelock:block/amethyst_seal_touch_lit"
+    },
+    "lit=false": {
+      "model": "zonelock:block/amethyst_seal_touch_unlit"
+    }
+  }
+}

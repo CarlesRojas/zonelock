@@ -1,0 +1,12 @@
+plugins {
+    id 'groovy-gradle-plugin'
+}
+
+repositories {
+    gradlePluginPortal()
+}
+
+dependencies {
+    // Publishes to Modrinth, CurseForge and GitHub Releases: https://modmuss50.github.io/mod-publish-plugin/
+    implementation 'me.modmuss50.mod-publish-plugin:me.modmuss50.mod-publish-plugin.gradle.plugin:2.2.1'
+}

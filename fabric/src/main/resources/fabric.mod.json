@@ -1,0 +1,38 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "homepage": "https://modrinth.com/mod/zonelock",
+        "sources": "https://github.com/CarlesRojas/mc-firstmod",
+        "issues": "https://github.com/CarlesRojas/mc-firstmod/issues"
+    },
+    "license": "${license}",
+    "icon": "assets/zonelock/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "app.pinya.zonelock.fabric.ZoneLockFabric"
+        ],
+        "client": [
+            "app.pinya.zonelock.fabric.ZoneLockFabricClient"
+        ],
+        "modmenu": [
+            "app.pinya.zonelock.fabric.ZoneLockModMenu"
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${fabric_loader_version}",
+        "fabric-api": "*",
+        "minecraft": "~${minecraft_version}",
+        "java": ">=${java_version}"
+    }
+}

@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build both loaders
+        run: ./gradlew build
+      - name: Server smoke test (NeoForge)
+        run: ./gradlew :neoforge:runGameTestServer
+      - name: Server smoke test (Fabric)
+        run: ./gradlew :fabric:runServerSmokeTest
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zonelock-jars
+          path: |
+            fabric/build/libs/*.jar
+            neoforge/build/libs/*.jar

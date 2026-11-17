@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "zonelock-gametest",
+  "version": "1.0.0",
+  "name": "Zone Lock game tests",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "app.pinya.zonelock.gametest.ZoneLockClientGameTest",
+      "app.pinya.zonelock.gametest.showcase.ShowcaseTest",
+      "app.pinya.zonelock.gametest.showcase.GalleryTest"
+    ]
+  },
+  "depends": {
+    "zonelock": "*"
+  }
+}

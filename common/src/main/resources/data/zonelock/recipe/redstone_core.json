@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    "zonelock:amethyst_core",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "id": "zonelock:redstone_core"
+  }
+}
