@@ -74,6 +74,8 @@ public class TrailerTest implements FabricClientGameTest {
     private boolean preview;
     /** {@code ZONELOCK_TRAILER=stills}: screenshots for the mod pages instead of the trailer. */
     private boolean stills;
+    /** {@code ZONELOCK_TRAILER=thumbnail}: hero shots of the tower in its zone, for the video's thumbnail. */
+    private boolean thumbnail;
     private Path root;
     private Path frames;
     private Writer events;
@@ -97,11 +99,13 @@ public class TrailerTest implements FabricClientGameTest {
             return;
         preview = "preview".equals(mode);
         stills = "stills".equals(mode);
+        thumbnail = "thumbnail".equals(mode);
         ctx = context;
         root = Path.of("").toAbsolutePath();
         while (root != null && !Files.exists(root.resolve("settings.gradle")))
             root = root.getParent();
-        frames = root.resolve("fabric/build/trailer/" + (preview ? "preview" : stills ? "stills" : "frames"));
+        frames = root.resolve("fabric/build/trailer/" + (preview ? "preview" : stills ? "stills" : thumbnail ? "thumbnail"
+                : "frames"));
         try {
             if (Files.exists(frames))
                 try (Stream<Path> old = Files.list(frames)) {
@@ -139,7 +143,9 @@ public class TrailerTest implements FabricClientGameTest {
             server = sp.getServer();
             connection = sp.getConnection();
             setUp();
-            if (stills)
+            if (thumbnail)
+                thumbnails();
+            else if (stills)
                 stills();
             else
                 record();
@@ -185,6 +191,8 @@ public class TrailerTest implements FabricClientGameTest {
             return best;
         });
         log("tower core " + towerCore);
+        if (thumbnail)
+            return; // the thumbnail only needs the tower
 
         // The maze out in the open: a flat, dry stretch of plains or meadow, levelled into the ground at the median
         // height of its footprint.
@@ -524,6 +532,59 @@ public class TrailerTest implements FabricClientGameTest {
         still("lava_forge");
         recipes();
         log("stills written to " + frames);
+    }
+
+    /**
+     * The tower in its zone, the wand in hand and the GUI hidden, from a few points round it (the tower to the right,
+     * room for the title on the left), for the video's thumbnail.
+     */
+    private void thumbnails() {
+        creative();
+        cinematic(true);
+        server.runCommand("clear @a");
+        give(0, "zonelock:resonance_wand", 1);
+        select(0);
+        hideHud(true);
+        Vec3 center = new Vec3(towerCore.getX() + 0.5, towerCore.getY() - 12, towerCore.getZ() + 2.5);
+        double[][] shots = { { 222, 34, 12 }, { 235, 32, 8 }, { 250, 36, 14 }, { 205, 30, 8 }, { 270, 36, 10 } };
+        for (int i = 0; i < shots.length; i++) {
+            double angle = shots[i][0], radius = shots[i][1], height = shots[i][2];
+            double clear = center.y + height;
+            for (double r : new double[] { radius, radius - 4 }) {
+                double rad = Math.toRadians(angle);
+                int x = (int) Math.floor(center.x + Math.sin(rad) * r), z = (int) Math.floor(center.z + Math.cos(rad) * r);
+                for (int dx = -2; dx <= 2; dx += 2)
+                    for (int dz = -2; dz <= 2; dz += 2)
+                        clear = Math.max(clear, canopy(x + dx, z + dz) + 4);
+            }
+            Vec3 e = orbitEye(center, radius, angle, clear - center.y);
+            // Further right than in the trailer: the thumbnail's title is bigger.
+            Vec3 f = center.subtract(e).multiply(1, 0, 1).normalize();
+            Vec3 l = center.add(0, 2, 0).subtract(new Vec3(-f.z, 0, f.x).scale(radius * 1.0));
+            cut(e, l);
+            settle(e);
+            select(0);
+            ctx.waitTicks(40);
+            still("thumb_" + i + "_walls");
+            select(1);
+            ctx.waitTicks(40);
+            still("thumb_" + i);
+        }
+        hideHud(false);
+        log("thumbnails written to " + frames);
+    }
+
+    /** What F1 does: no hotbar, no hand, no crosshair. */
+    private void hideHud(boolean hidden) {
+        ctx.runOnClient(mc -> {
+            try {
+                var field = net.minecraft.client.gui.Hud.class.getDeclaredField("isHidden");
+                field.setAccessible(true);
+                field.setBoolean(mc.gui.hud, hidden);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     /** Each recipe laid out in a crafting table, one still each (compose.py's recipes sheet crops them). */
