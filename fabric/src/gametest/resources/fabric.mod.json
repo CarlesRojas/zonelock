@@ -7,8 +7,10 @@
   "entrypoints": {
     "fabric-client-gametest": [
       "app.pinya.zonelock.gametest.ZoneLockClientGameTest",
+      "app.pinya.zonelock.gametest.TrapScenarioTest",
       "app.pinya.zonelock.gametest.showcase.ShowcaseTest",
-      "app.pinya.zonelock.gametest.showcase.GalleryTest"
+      "app.pinya.zonelock.gametest.showcase.GalleryTest",
+      "app.pinya.zonelock.gametest.showcase.TrailerTest"
     ]
   },
   "depends": {
