@@ -68,7 +68,7 @@ public final class ZoneLock {
                 "net.minecraft.world.item.ItemStack",
                 "net.minecraft.world.item.BlockItem", "net.minecraft.world.entity.player.Player",
                 "net.minecraft.world.entity.LivingEntity", "net.minecraft.world.level.Level",
-                "net.minecraft.server.level.ServerLevel" };
+                "net.minecraft.server.level.ServerLevel", "net.minecraft.server.level.ServerPlayer" };
         for (String target : targets) {
             try {
                 Class.forName(target, false, ZoneLock.class.getClassLoader());

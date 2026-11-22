@@ -43,7 +43,7 @@ public final class ModBlocks {
                 .strength(5.0F, 1200.0F)
                 .requiresCorrectToolForDrops()
                 .sound(SoundType.AMETHYST)
-                .lightLevel(state -> state.getValue(CoreBlock.ARMED) ? 11 : 3)
+                .lightLevel(state -> state.getValue(CoreBlock.ARMED) || state.getValue(CoreBlock.PENDING) ? 11 : 3)
                 .pushReaction(PushReaction.IMMOVEABLE)
                 .noOcclusion()
                 .setId(key);

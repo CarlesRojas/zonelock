@@ -177,6 +177,17 @@ public final class TestWorld {
         // 12. Ripple lab: every kind of shape inside one sealed zone, to hit them all.
         rippleLab();
 
+        // 11. Ways a builder could shut themselves in while arming a dungeon (TrapScenarios), in a row south of the
+        // platform, each with its sign.
+        server.runCommand("forceload add -16 30 " + (TrapScenarios.ALL.length * 22) + " 70");
+        for (int i = 0; i < TrapScenarios.ALL.length; i++) {
+            TrapScenarios.Scenario scenario = TrapScenarios.ALL[i];
+            BlockPos origin = new BlockPos(i * 22, Y, 42);
+            scenario.builder().build(server, origin);
+            label(origin.getX() + 3, origin.getZ() - 7, "11." + (i + 1) + " · " + scenario.title(),
+                    scenario.description());
+        }
+
         // The mod's dungeons, generated on the terrain below the platform.
         server.runCommand("forceload add -48 " + (DUNGEON_Z - 48) + " 240 " + (DUNGEON_Z + 64));
         for (int i = 0; i < DUNGEONS.length; i++)

@@ -43,6 +43,8 @@ public class CoreBlock extends BaseEntityBlock {
     public static final EnumProperty<Mirror> MIRROR = EnumProperty.create("mirror", Mirror.class);
     /** Receives a redstone signal: the Redstone Core's redstone glows, like a repeater's torch. */
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    /** The shard is on (the crystal shows) but the zone waits for everyone to leave before it locks. */
+    public static final BooleanProperty PENDING = BooleanProperty.create("pending");
 
     /** Side the keyhole is on: it faces whoever placed the core. */
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -68,7 +70,8 @@ public class CoreBlock extends BaseEntityBlock {
         super(properties);
         this.lock = lock;
         registerDefaultState(stateDefinition.any().setValue(ARMED, false).setValue(ROTATION, Rotation.NONE)
-                .setValue(MIRROR, Mirror.NONE).setValue(FACING, Direction.NORTH).setValue(POWERED, false));
+                .setValue(MIRROR, Mirror.NONE).setValue(FACING, Direction.NORTH).setValue(POWERED, false)
+                .setValue(PENDING, false));
     }
 
     public Lock lock() {
@@ -96,7 +99,7 @@ public class CoreBlock extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(ARMED, ROTATION, MIRROR, FACING, POWERED);
+        builder.add(ARMED, ROTATION, MIRROR, FACING, POWERED, PENDING);
     }
 
     @Override
@@ -156,6 +159,20 @@ public class CoreBlock extends BaseEntityBlock {
             level.setBlock(pos, state.setValue(POWERED, powered), Block.UPDATE_CLIENTS);
         if (level.getBlockEntity(pos) instanceof CoreBlockEntity core)
             core.onNeighborSignal(powered);
+    }
+
+    /**
+     * A switched-off core gives a redstone signal (15, like a redstone block): the treasure room it guards can open
+     * when it is beaten, and stays open while it is being built.
+     */
+    @Override
+    protected boolean isSignalSource(BlockState state) {
+        return true;
+    }
+
+    @Override
+    protected int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return state.getValue(ARMED) ? 0 : 15;
     }
 
     /** An armed core cannot be mined; switch it off first. */

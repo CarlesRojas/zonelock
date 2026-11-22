@@ -49,7 +49,13 @@ public final class ZoneVisuals {
     /** How wide the patch of an armed zone's wall is that shows without the wand (it shows from 1.4 times as far). */
     private static final double NEAR_RADIUS = 6.0;
 
+    /** Ticks the wand's view of the zones takes to fade in when it is taken in hand, and out when it is put away. */
+    private static final double WAND_FADE = 8.0;
+
     private static @Nullable TutorialToast wandToast;
+    private static boolean wandShown;
+    private static double wandChangedAt = -1e9;
+    private static float wandFrom;
 
     private ZoneVisuals() {
     }
@@ -71,6 +77,11 @@ public final class ZoneVisuals {
                     && hit.getEntity() == decoration ? hit.getLocation() : decoration.getBoundingBox().getCenter();
             started = BlockRipples.startOnBox(pos, decoration.getBoundingBox(), at, mc.level.getGameTime());
         } else {
+            // A block refused to go in: the ripple goes where the player clicked (the face it would have been put
+            // against), not on the empty place where it would have appeared.
+            if (mc.hitResult instanceof BlockHitResult hit && hit.getType() == HitResult.Type.BLOCK
+                    && !hit.getBlockPos().equals(pos) && hit.getBlockPos().relative(hit.getDirection()).equals(pos))
+                pos = hit.getBlockPos();
             VoxelShape shape = BlockRipples.surface(mc.level.getBlockState(pos), mc.level, pos);
             started = BlockRipples.start(mc.level, pos, hitPoint(mc, pos, shape), mc.level.getGameTime());
         }
@@ -126,15 +137,22 @@ public final class ZoneVisuals {
 
         List<ZoneForcefield.Patch> patches = new ArrayList<>();
         boolean reveal = holding(player, ModItems.WAND.get());
-        // With the wand: armed zones show moving runes, switched-off ones still ones, and the wall the wand points at
-        // (of a zone that can be reshaped) lights up.
-        if (reveal) {
-            WandTarget target = ResonanceWandItem.clientTarget(player, ResonanceWandItem.blockDistance(player))
-                    .orElse(null);
+        long now = level.getGameTime();
+        if (reveal != wandShown) {
+            wandFrom = wandLevel(now);
+            wandChangedAt = now;
+            wandShown = reveal;
+        }
+        // With the wand (and while its view fades out): armed zones show moving runes, switched-off ones still ones,
+        // and the wall the wand points at (of a zone that can be reshaped) lights up.
+        if (reveal || wandLevel(now) > 0) {
+            WandTarget target = reveal ? ResonanceWandItem.clientTarget(player, ResonanceWandItem.blockDistance(player))
+                    .orElse(null) : null;
             for (Zone zone : ClientZoneCache.INDEX.near(eye, REVEAL_RANGE))
                 patches.add(ZoneForcefield.Patch.whole(zone.box(), eye, zone.active(),
                             target != null && target.zone().id().equals(zone.id()) ? target.face() : null));
-        } else if (ZoneLockConfig.nearbyWalls) {
+        }
+        if (!reveal && ZoneLockConfig.nearbyWalls) {
             // Without the wand: a patch of an armed zone's wall shows around you as you come close to it.
             for (Zone zone : ClientZoneCache.INDEX.near(eye, NEAR_RADIUS * ZoneForcefield.NEAR_REACH))
                 if (zone.active())
@@ -157,6 +175,16 @@ public final class ZoneVisuals {
             wandToast.hide();
             wandToast = null;
         }
+    }
+
+    /**
+     * How much of the wand's view shows at {@code time} (game ticks, with the partial tick): it eases in over
+     * {@link #WAND_FADE} ticks when the wand is taken in hand and out when it is put away.
+     */
+    public static float wandLevel(double time) {
+        double k = Math.min(1.0, Math.max(0.0, (time - wandChangedAt) / WAND_FADE));
+        k = k * k * (3 - 2 * k);
+        return (float) (wandFrom + ((wandShown ? 1.0F : 0.0F) - wandFrom) * k);
     }
 
     // ------------------------------------------------------------------ helpers

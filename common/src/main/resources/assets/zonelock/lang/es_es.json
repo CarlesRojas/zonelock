@@ -82,5 +82,9 @@
   "gui.zonelock.tier.3": "Bloque de esmeralda o amatista · %s bloques por lado",
   "gui.zonelock.tier.4": "Bloque de diamante · %s bloques por lado",
   "gui.zonelock.tier.5": "Bloque de netherita · %s bloques por lado",
-  "gui.zonelock.reach_title": "Alcance por lado"
+  "gui.zonelock.reach_title": "Alcance por lado",
+  "hud.zonelock.goal.pending": "Sal de la zona para cerrarla",
+  "message.zonelock.pending": "%s se cerrará cuando todos hayan salido",
+  "message.zonelock.pending_wand": "Guarda la varita para cerrar %s",
+  "message.zonelock.pending_cancelled": "El cristal se suelta: %s sigue abierta"
 }

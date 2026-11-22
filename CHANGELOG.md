@@ -6,6 +6,11 @@ Complete rewrite for Minecraft 26.3, now on both Fabric and NeoForge.
 - Two cores: Amethyst Core (seals) and Redstone Core.
 - New Amethyst Seal, Redstone Seal and Resonance Wand. Cores are armed by placing an amethyst shard on top.
 - Ten protection rules per zone, including ender pearls, chorus fruit, elytra and riptide.
+- A shard placed on a core seals the zone once everyone has left it (and nobody near holds a wand): nobody gets shut
+  in by arming a dungeon from inside. Sneak + use takes the shard back.
+- Beds and respawn anchors inside a sealed zone don't bring you back into it.
+- Seals and cores give a redstone signal whenever they aren't holding anything shut (a seal put out, a core switched
+  off, any of them while the zone isn't armed): doors wired to them chain the rooms of a dungeon.
 - Hidden border revealed by the Resonance Wand; blocks that refuse to change ripple over their real shape; a small
   progress card in the inventory.
 - Survival progression with focus blocks; configuration kept when switched off; reset button.

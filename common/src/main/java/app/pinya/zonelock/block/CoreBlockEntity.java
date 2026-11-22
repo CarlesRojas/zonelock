@@ -62,6 +62,15 @@ public class CoreBlockEntity extends BlockEntity {
 
     private CoreConfig config = CoreConfig.DEFAULT;
     private boolean armed;
+    /**
+     * A shard is on the core but the zone isn't locked yet: it locks once nobody is inside it, whoever placed the shard
+     * has been seen outside since, and nobody near it holds a Resonance Wand (still working on it from outside). Until
+     * then everything stays as it was while switched off: editable, seals asleep and giving their signal.
+     */
+    private boolean pending;
+    private @Nullable UUID pendingBy;
+    private boolean pendingLeft;
+    private int pendingNotice;
     private UUID zoneId = UUID.randomUUID();
     private ItemStack focus = ItemStack.EMPTY;
     /** Zone that protected the structure until this core generated; removed once this core publishes its own. */
@@ -84,6 +93,44 @@ public class CoreBlockEntity extends BlockEntity {
     public static void serverTick(Level level, BlockPos pos, BlockState state, CoreBlockEntity core) {
         if (!core.registered && level instanceof ServerLevel serverLevel)
             core.register(serverLevel, state);
+        if (core.pending && level instanceof ServerLevel serverLevel && level.getGameTime() % 5 == 0)
+            core.tickPending(serverLevel);
+    }
+
+    /** How far from the zone a player holding the wand keeps it from locking (working on it from outside). */
+    private static final int WAND_HOLD = 8;
+
+    /** Locks the zone once nobody is inside, the one who placed the shard has left, and nobody near holds a wand. */
+    private void tickPending(ServerLevel level) {
+        ZoneBox zone = box();
+        ZoneBox near = zone.inflate(WAND_HOLD);
+        boolean inside = false;
+        ServerPlayer wand = null;
+        for (ServerPlayer player : level.players()) {
+            if (player.isSpectator())
+                continue;
+            boolean in = zone.contains(player.blockPosition()) || zone.contains(BlockPos.containing(player.getEyePosition()));
+            if (!in && player.getUUID().equals(pendingBy))
+                pendingLeft = true;
+            if (in)
+                inside = true;
+            else if (near.contains(player.blockPosition()) && (player.getMainHandItem().is(ModItems.WAND.get())
+                    || player.getOffhandItem().is(ModItems.WAND.get())))
+                wand = player;
+        }
+        // Whoever placed the shard and logged out inside it keeps it open until they come back and leave.
+        if (inside || pendingBy != null && !pendingLeft)
+            return;
+        if (wand != null) {
+            if (pendingNotice++ % 8 == 0)
+                wand.sendOverlayMessage(Component.translatable("message.zonelock.pending_wand", displayName()));
+            return;
+        }
+        arm();
+    }
+
+    public boolean isPending() {
+        return pending;
     }
 
     /** First tick after loading or placing: apply the structure transform and publish the zone. */
@@ -131,7 +178,9 @@ public class CoreBlockEntity extends BlockEntity {
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         if (level instanceof ServerLevel serverLevel) {
+            Optional<Zone> zone = ZoneManager.get(serverLevel).zone(zoneId);
             ZoneManager.get(serverLevel).remove(zoneId);
+            zone.ifPresent(z -> updateSeals(serverLevel, z));
             if (!focus.isEmpty())
                 Block.popResource(level, pos, focus.copy());
         }
@@ -227,7 +276,7 @@ public class CoreBlockEntity extends BlockEntity {
 
     public Zone toZone() {
         LockInfo lock = new LockInfo(config.seals(), config.redstone(), 0, 0);
-        return new Zone(zoneId, worldPosition, box(), armed, config.name(), config.rules(), lock);
+        return new Zone(zoneId, worldPosition, box(), armed, config.name(), config.rules(), lock, pending);
     }
 
     private Optional<Zone> publish() {
@@ -287,6 +336,11 @@ public class CoreBlockEntity extends BlockEntity {
 
     /** Right click with an empty hand (or an item that did nothing). */
     public void use(ServerPlayer player) {
+        // Changed your mind before leaving: sneak and use takes the shard back off.
+        if (pending && player.isShiftKeyDown() && canEdit(player)) {
+            cancelPending(player);
+            return;
+        }
         if (canEdit(player) && !player.isShiftKeyDown()) {
             openScreen(player);
             return;
@@ -325,6 +379,7 @@ public class CoreBlockEntity extends BlockEntity {
         armed = false;
         level.setBlock(worldPosition, getBlockState().setValue(CoreBlock.ARMED, false), Block.UPDATE_ALL);
         changed();
+        updateSeals(level, toZone());
         play(ModSounds.CORE_UNLOCK.get(), 1.0F);
         // The crystal shatters and is gone: amethyst shards like a cluster breaking, a few sparks rising.
         double x = worldPosition.getX() + 0.5, y = worldPosition.getY() + 1.3, z = worldPosition.getZ() + 0.5;
@@ -359,18 +414,36 @@ public class CoreBlockEntity extends BlockEntity {
     public void arm() {
         if (armed || !(level instanceof ServerLevel serverLevel))
             return;
+        pending = false;
+        pendingBy = null;
         // A challenge always starts complete: every seal of the zone burns again.
         for (BlockPos seal : ZoneManager.get(serverLevel).sealsIn(toZone()).keySet())
             SealBlock.relight(serverLevel, seal);
         // A zone bigger than the focus allows (a beaten structure core armed again where it stands) shrinks to fit.
         config = config.withExtents(config.extents().clamp(maxExtent()));
         armed = true;
-        serverLevel.setBlock(worldPosition, getBlockState().setValue(CoreBlock.ARMED, true), Block.UPDATE_ALL);
+        serverLevel.setBlock(worldPosition, getBlockState().setValue(CoreBlock.ARMED, true)
+                .setValue(CoreBlock.PENDING, false), Block.UPDATE_ALL);
         play(ModSounds.CORE_ARM.get(), 1.0F);
         changed();
+        updateSeals(serverLevel, toZone());
+    }
+
+    /**
+     * Seals give a redstone signal whenever they aren't holding anything shut, so when the zone is armed, switched off
+     * or removed, the redstone round each seal is told to look again.
+     */
+    private static void updateSeals(ServerLevel level, Zone zone) {
+        for (BlockPos seal : ZoneManager.get(level).sealsIn(zone).keySet())
+            if (level.isLoaded(seal))
+                level.updateNeighborsAt(seal, level.getBlockState(seal).getBlock());
     }
 
     public void disarm() {
+        if (pending) {
+            cancelPending(null);
+            return;
+        }
         if (!armed || !(level instanceof ServerLevel serverLevel))
             return;
         armed = false;
@@ -380,19 +453,45 @@ public class CoreBlockEntity extends BlockEntity {
         Block.popResourceFromFace(serverLevel, worldPosition, net.minecraft.core.Direction.UP,
                 new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD));
         changed();
+        updateSeals(serverLevel, toZone());
     }
 
     /**
-     * Placing an amethyst shard on a switched-off core puts its crystal back and arms it: the challenge starts over
-     * (every seal burns again).
+     * Placing an amethyst shard on a switched-off core puts its crystal back; the zone locks (every seal burns again)
+     * as soon as everyone has left it, so nobody is ever shut in by arming it from inside.
      */
     public boolean placeCrystal(ServerPlayer player, ItemStack stack) {
-        if (armed || !canEdit(player))
+        if (armed || pending || !canEdit(player))
             return false;
         if (!player.hasInfiniteMaterials())
             stack.shrink(1);
-        arm();
+        pending = true;
+        pendingBy = player.getUUID();
+        pendingLeft = false;
+        pendingNotice = 0;
+        if (level instanceof ServerLevel serverLevel) {
+            serverLevel.setBlock(worldPosition, getBlockState().setValue(CoreBlock.PENDING, true), Block.UPDATE_ALL);
+            play(ModSounds.CORE_ARM.get(), 0.8F);
+            changed();
+            player.sendOverlayMessage(Component.translatable("message.zonelock.pending", displayName()));
+            tickPending(serverLevel);
+        }
         return true;
+    }
+
+    /** The shard comes back off a core waiting to lock; the zone stays as it was. */
+    public void cancelPending(@Nullable ServerPlayer by) {
+        if (!pending || !(level instanceof ServerLevel serverLevel))
+            return;
+        pending = false;
+        pendingBy = null;
+        serverLevel.setBlock(worldPosition, getBlockState().setValue(CoreBlock.PENDING, false), Block.UPDATE_ALL);
+        play(ModSounds.CORE_DISARM.get(), 1.0F);
+        Block.popResourceFromFace(serverLevel, worldPosition, net.minecraft.core.Direction.UP,
+                new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD));
+        changed();
+        if (by != null)
+            by.sendOverlayMessage(Component.translatable("message.zonelock.pending_cancelled", displayName()));
     }
 
     public void setConfig(CoreConfig value) {
@@ -500,6 +599,11 @@ public class CoreBlockEntity extends BlockEntity {
         super.saveAdditional(output);
         output.store("config", CoreConfig.CODEC, config);
         output.putBoolean("armed", armed);
+        if (pending) {
+            output.putBoolean("pending", true);
+            output.storeNullable("pending_by", UUIDUtil.CODEC, pendingBy);
+            output.putBoolean("pending_left", pendingLeft);
+        }
         output.store("zone_id", UUIDUtil.CODEC, zoneId);
         output.storeNullable("replaces", UUIDUtil.CODEC, replaces);
         if (!focus.isEmpty())
@@ -511,6 +615,9 @@ public class CoreBlockEntity extends BlockEntity {
         super.loadAdditional(input);
         config = fit(input.read("config", CoreConfig.CODEC).orElse(CoreConfig.DEFAULT));
         armed = input.getBooleanOr("armed", false);
+        pending = !armed && input.getBooleanOr("pending", false);
+        pendingBy = input.read("pending_by", UUIDUtil.CODEC).orElse(null);
+        pendingLeft = input.getBooleanOr("pending_left", false);
         zoneId = input.read("zone_id", UUIDUtil.CODEC).orElseGet(UUID::randomUUID);
         replaces = input.read("replaces", UUIDUtil.CODEC).orElse(null);
         focus = input.read("focus", ItemStack.CODEC).orElse(ItemStack.EMPTY);

@@ -2,8 +2,16 @@
   "multipart": [
     {
       "when": {
-        "armed": "true",
-        "powered": "true"
+        "OR": [
+          {
+            "armed": "true",
+            "powered": "true"
+          },
+          {
+            "pending": "true",
+            "powered": "true"
+          }
+        ]
       },
       "apply": {
         "model": "zonelock:block/redstone_core_armed_powered"
@@ -11,8 +19,16 @@
     },
     {
       "when": {
-        "armed": "true",
-        "powered": "false"
+        "OR": [
+          {
+            "armed": "true",
+            "powered": "false"
+          },
+          {
+            "pending": "true",
+            "powered": "false"
+          }
+        ]
       },
       "apply": {
         "model": "zonelock:block/redstone_core_armed"
@@ -21,6 +37,7 @@
     {
       "when": {
         "armed": "false",
+        "pending": "false",
         "powered": "true"
       },
       "apply": {
@@ -30,6 +47,7 @@
     {
       "when": {
         "armed": "false",
+        "pending": "false",
         "powered": "false"
       },
       "apply": {

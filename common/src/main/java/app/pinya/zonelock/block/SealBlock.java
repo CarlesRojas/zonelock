@@ -35,6 +35,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * A seal joins the lock of every core whose zone contains it: while it burns, those cores cannot be switched off.
  * The Amethyst Seal is put out by touching it; the Redstone Seal by a redstone signal. They only react while an
  * armed core guards them, so building and wiring a dungeon never puts them out by accident.
+ * <p>
+ * A seal gives a redstone signal (15, like a redstone block) whenever it isn't holding anything shut: once it is put
+ * out, and while its zone isn't armed. So a door wired to a seal stands open while the dungeon is being built, shuts
+ * when the core is armed, and opens again when a challenger puts the seal out: one room leads to the next.
  */
 public class SealBlock extends BaseEntityBlock {
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
@@ -85,6 +89,21 @@ public class SealBlock extends BaseEntityBlock {
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
+    }
+
+    @Override
+    protected boolean isSignalSource(BlockState state) {
+        return true;
+    }
+
+    @Override
+    protected int getSignal(BlockState state, BlockGetter level, BlockPos pos, net.minecraft.core.Direction direction) {
+        return holdsShut(state, level, pos) ? 0 : 15;
+    }
+
+    /** Lit and guarded by an armed core: then, and only then, the seal gives no signal. */
+    private static boolean holdsShut(BlockState state, BlockGetter level, BlockPos pos) {
+        return state.getValue(LIT) && level instanceof ServerLevel serverLevel && isGuarded(serverLevel, pos);
     }
 
     @Override
