@@ -33,8 +33,9 @@ public class ZoneLockClientGameTest implements FabricClientGameTest {
 
     @Override
     public void runTest(ClientGameTestContext ctx) {
-        if (System.getenv("ZONELOCK_SHOWCASE") != null || System.getenv("ZONELOCK_GALLERY") != null)
-            return; // the showcase run only records the video, the gallery run only takes close-ups
+        if (System.getenv("ZONELOCK_SHOWCASE") != null || System.getenv("ZONELOCK_GALLERY") != null
+                || System.getenv("ZONELOCK_TRAILER") != null)
+            return; // the showcase, gallery and trailer runs only record their own shots
         try (TestSingleplayerContext sp = ctx.worldBuilder().setUseConsistentSettings(false).create()) {
             TestServerContext server = sp.getServer();
             TestServerConnection connection = sp.getConnection();

@@ -44,6 +44,9 @@ public class TrapScenarioTest implements FabricClientGameTest {
 
     @Override
     public void runTest(ClientGameTestContext context) {
+        if (System.getenv("ZONELOCK_SHOWCASE") != null || System.getenv("ZONELOCK_GALLERY") != null
+                || System.getenv("ZONELOCK_TRAILER") != null)
+            return; // the showcase, gallery and trailer runs only record their own shots
         ctx = context;
         try (TestSingleplayerContext sp = ctx.worldBuilder().setUseConsistentSettings(false)
                 .adjustSettings(s -> s.setAllowCommands(true)).create()) {
