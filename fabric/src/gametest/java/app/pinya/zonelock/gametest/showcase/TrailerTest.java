@@ -186,8 +186,11 @@ public class TrailerTest implements FabricClientGameTest {
         });
         log("tower core " + towerCore);
 
-        // The maze on the lawn east of the tower, levelled into the ground at the median height of its footprint.
-        int mx = towerCore.getX() + 44, mz = towerCore.getZ() - 4;
+        // The maze out in the open: a flat, dry stretch of plains or meadow, levelled into the ground at the median
+        // height of its footprint.
+        BlockPos field = flatMeadow(new BlockPos(fx, 80, fz));
+        int mx = field.getX(), mz = field.getZ();
+        server.runCommand("forceload add " + (mx - 48) + " " + (mz - 48) + " " + (mx + 48) + " " + (mz + 64));
         List<Integer> heights = new ArrayList<>();
         for (int dx = -12; dx <= 12; dx += 3)
             for (int dz = -12; dz <= 12; dz += 3)
@@ -195,6 +198,7 @@ public class TrailerTest implements FabricClientGameTest {
         heights.sort(null);
         int lawn = heights.get(heights.size() / 2) - 1;
         maze = placeSet("maze", new BlockPos(mx - 12, lawn - 5, mz - 12));
+        blendGround(mx, mz, lawn, 12, 12);
 
         // The rooms, far away and high up, closed all round.
         int rx = fx + 900;
@@ -247,6 +251,201 @@ public class TrailerTest implements FabricClientGameTest {
         });
         log("set " + name + " at " + corner);
         return corner.offset(o[0], o[1], o[2]);
+    }
+
+    /**
+     * The middle of a flat, dry, treeless patch of plains or meadow near {@code from}: the ground under the maze and
+     * the open grass the crane shot looks over (south of it) both within a few blocks of the same height.
+     */
+    private BlockPos flatMeadow(BlockPos from) {
+        // Plains found from 25 starting points round the forest, each tried as it is and a little to every side.
+        List<BlockPos> plains = new ArrayList<>();
+        for (int ox = -2; ox <= 2; ox++)
+            for (int oz = -2; oz <= 2; oz++) {
+                BlockPos origin = from.offset(ox * 600, 0, oz * 600);
+                BlockPos found = server.computeOnServer(s -> {
+                    var f = s.overworld().findClosestBiome3d(b -> b.is(Biomes.PLAINS) || b.is(Biomes.SUNFLOWER_PLAINS),
+                            origin, 600, 16, 64);
+                    return f == null ? null : f.getFirst();
+                });
+                if (found != null && plains.stream().noneMatch(p -> p.distManhattan(found) < 96))
+                    plains.add(found);
+            }
+        log("plains " + plains.size());
+        // First a cheap pass on the biomes alone (no chunk is generated for it): green country round the site and
+        // behind it. Then, for the best ten, the ground itself: flatness and water, and the height of what's behind.
+        List<int[]> scored = new ArrayList<>();
+        for (BlockPos p : plains)
+            for (int ox = -1; ox <= 1; ox++)
+                for (int oz = -1; oz <= 1; oz++) {
+                    int cx = p.getX() + ox * 40, cz = p.getZ() + oz * 40;
+                    scored.add(new int[] { cx, cz, biomeCost(cx, cz) });
+                }
+        scored.sort(java.util.Comparator.comparingInt(c -> c[2]));
+        BlockPos best = null;
+        int bestScore = Integer.MAX_VALUE;
+        for (int i = 0; i < Math.min(10, scored.size()); i++) {
+            int[] c = scored.get(i);
+            int ground = spread(c[0], c[1]);
+            if (ground >= 1000) {
+                log("maze site " + c[0] + " " + c[1] + " biomes " + c[2] + ": water");
+                continue;
+            }
+            int score = 3 * ground + c[2] + backdrop(c[0], c[1]);
+            log("maze site " + c[0] + " " + c[1] + " biomes " + c[2] + " ground " + ground + " total " + score);
+            if (score < bestScore) {
+                bestScore = score;
+                best = new BlockPos(c[0], 0, c[1]);
+            }
+        }
+        log("maze field " + best + " score " + bestScore);
+        if (best == null || bestScore >= 1000)
+            throw new AssertionError("no dry, flat field for the maze near " + from);
+        return best;
+    }
+
+    /**
+     * Biomes round a site (the maze, its lawn to the south) and behind it (north, where the crane shot looks): every
+     * sample that isn't green low country costs, the ones near the maze most. Noise lookups only, no chunk loads.
+     */
+    private int biomeCost(int cx, int cz) {
+        return server.computeOnServer(s -> {
+            var level = s.overworld();
+            int cost = 0;
+            for (int dz = -200; dz <= 60; dz += 20)
+                for (int dx = -100; dx <= 100; dx += 20) {
+                    var biome = level.getBiome(new BlockPos(cx + dx, 72, cz + dz));
+                    boolean green = biome.is(Biomes.PLAINS) || biome.is(Biomes.SUNFLOWER_PLAINS)
+                            || biome.is(Biomes.FOREST) || biome.is(Biomes.BIRCH_FOREST) || biome.is(Biomes.FLOWER_FOREST)
+                            || biome.is(Biomes.DARK_FOREST);
+                    if (!green)
+                        cost += Math.abs(dx) <= 40 && dz >= -40 ? 30 : 10;
+                }
+            return cost;
+        });
+    }
+
+    /**
+     * What lies behind the maze in the crane shot (north of it, where the camera looks): snow or ice and high ground
+     * (hills, mountains) cost; a plain green horizon costs nothing.
+     */
+    private int backdrop(int cx, int cz) {
+        return server.computeOnServer(s -> {
+            var level = s.overworld();
+            int base = level.getChunk(cx >> 4, cz >> 4).getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, cx & 15,
+                    cz & 15);
+            int cost = 0, snow = 0, foreign = 0, highest = Integer.MIN_VALUE;
+            for (int dz = -40; dz >= -180; dz -= 20)
+                for (int dx = -100; dx <= 100; dx += 25) {
+                    int x = cx + dx, z = cz + dz;
+                    var chunk = level.getChunk(x >> 4, z >> 4);
+                    int top = chunk.getHeight(Heightmap.Types.WORLD_SURFACE, x & 15, z & 15) - 1;
+                    var block = level.getBlockState(new BlockPos(x, top, z));
+                    if (block.is(net.minecraft.world.level.block.Blocks.SNOW)
+                            || block.is(net.minecraft.world.level.block.Blocks.SNOW_BLOCK)
+                            || block.is(net.minecraft.world.level.block.Blocks.POWDER_SNOW)
+                            || block.is(net.minecraft.tags.BlockTags.ICE))
+                        snow++;
+                    // Green, low country behind: plains and the woods next to them; anything else (snow, slopes,
+                    // mountains, desert) stands out behind a hedge maze.
+                    var biome = level.getBiome(new BlockPos(x, top, z));
+                    if (!(biome.is(Biomes.PLAINS) || biome.is(Biomes.SUNFLOWER_PLAINS) || biome.is(Biomes.FOREST)
+                            || biome.is(Biomes.BIRCH_FOREST) || biome.is(Biomes.FLOWER_FOREST)
+                            || biome.is(Biomes.RIVER) || biome.is(Biomes.DARK_FOREST)))
+                        foreign++;
+                    highest = Math.max(highest, top);
+                    cost += Math.max(0, top - base - 12) * 2;
+                }
+            log("  backdrop " + cx + " " + cz + ": snow " + snow + ", other biomes " + foreign + ", highest " + highest
+                    + " (ground " + base + ")");
+            return cost + 25 * snow;
+        });
+    }
+
+    /**
+     * Eases the natural ground into the maze's lawn: within {@code reach} blocks of its footprint ({@code half} blocks
+     * each side of the middle) each column's surface slides smoothly from the lawn's height at the garden wall to its
+     * own height further out, so the maze sits in the meadow instead of on a cut-out terrace. Plants, flowers and the
+     * ground further away stay as the world made them.
+     */
+    private void blendGround(int mx, int mz, int lawn, int half, int reach) {
+        server.runOnServer(s -> {
+            ServerLevel level = s.overworld();
+            net.minecraft.world.level.block.state.BlockState grass = net.minecraft.world.level.block.Blocks.GRASS_BLOCK.defaultBlockState();
+            net.minecraft.world.level.block.state.BlockState dirt = net.minecraft.world.level.block.Blocks.DIRT.defaultBlockState();
+            net.minecraft.world.level.block.state.BlockState air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+            for (int x = mx - half - reach; x <= mx + half + reach; x++)
+                for (int z = mz - half - reach; z <= mz + half + reach; z++) {
+                    int dx = Math.max(Math.max(mx - half - x, x - (mx + half)), 0);
+                    int dz = Math.max(Math.max(mz - half - z, z - (mz + half)), 0);
+                    double d = Math.sqrt(dx * dx + dz * dz);
+                    if (d == 0) {
+                        // Over the maze itself the set clears only so high: whatever ground rose above it goes too.
+                        for (int y = lawn + 9; y <= lawn + 48; y++)
+                            if (!level.getBlockState(new BlockPos(x, y, z)).isAir())
+                                level.setBlock(new BlockPos(x, y, z), air, Block.UPDATE_CLIENTS);
+                        continue;
+                    }
+                    if (d > reach)
+                        continue;
+                    double t = d / reach;
+                    t = t * t * (3 - 2 * t);
+                    // The natural ground: the top block that isn't a plant, a log or leaves.
+                    int g = level.getChunk(x >> 4, z >> 4).getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                            x & 15, z & 15) - 1;
+                    while (g > lawn - 24) {
+                        net.minecraft.world.level.block.state.BlockState st = level.getBlockState(new BlockPos(x, g, z));
+                        if (st.isAir() || st.canBeReplaced() || st.is(net.minecraft.tags.BlockTags.LOGS)
+                                || st.is(net.minecraft.tags.BlockTags.LEAVES))
+                            g--;
+                        else
+                            break;
+                    }
+                    int h = (int) Math.round(lawn + (g - lawn) * t);
+                    if (h == g)
+                        continue;
+                    if (h < g)
+                        for (int y = h + 1; y <= g + 2; y++)
+                            level.setBlock(new BlockPos(x, y, z), air, Block.UPDATE_CLIENTS);
+                    else
+                        for (int y = g + 1; y < h; y++)
+                            level.setBlock(new BlockPos(x, y, z), dirt, Block.UPDATE_CLIENTS);
+                    level.setBlock(new BlockPos(x, h, z), grass, Block.UPDATE_CLIENTS);
+                    // A raised column loses the grass or flower it had on top; give some of it back.
+                    if (h > g && ((x * 31 + z * 17) & 7) == 0)
+                        level.setBlock(new BlockPos(x, h + 1, z),
+                                net.minecraft.world.level.block.Blocks.SHORT_GRASS.defaultBlockState(), Block.UPDATE_CLIENTS);
+                }
+        });
+        ctx.waitTicks(10);
+    }
+
+    /**
+     * How unfit a maze site is: the height range of the ground round it, its camera lawn to the south and a margin
+     * (hills and mountains), plus the trees; any water at all rules it out (it floods the paths and its current pushes
+     * the player into the hedges).
+     */
+    private int spread(int cx, int cz) {
+        return server.computeOnServer(s -> {
+            var level = s.overworld();
+            int lo = Integer.MAX_VALUE, hi = Integer.MIN_VALUE, trees = 0;
+            for (int dx = -30; dx <= 30; dx += 3)
+                for (int dz = -36; dz <= 46; dz += 3) {
+                    int x = cx + dx, z = cz + dz;
+                    var chunk = level.getChunk(x >> 4, z >> 4);
+                    int ground = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x & 15, z & 15);
+                    int top = chunk.getHeight(Heightmap.Types.MOTION_BLOCKING, x & 15, z & 15);
+                    if (Math.abs(dx) <= 32 && dz >= -28 && dz <= 56
+                            && !level.getFluidState(new BlockPos(x, ground - 1, z)).isEmpty())
+                        return 1000;
+                    if (top > ground + 1)
+                        trees++;
+                    lo = Math.min(lo, ground);
+                    hi = Math.max(hi, ground);
+                }
+            // A tree trunk counts as ground too (no leaves heightmap), so both show up as spread; leaves add a bit.
+            return hi - lo + trees / 2;
+        });
     }
 
     private int surface(int x, int z) {
@@ -445,11 +644,14 @@ public class TrailerTest implements FabricClientGameTest {
         }
     }
 
-    /** A point beside {@code target}, so it sits in the right third of the frame (the words go on the left). */
+    /**
+     * A point beside {@code target}, so it sits about three quarters of the way across the frame: halfway between the
+     * end of the title (which takes the left half) and the right edge.
+     */
     private static Vec3 aside(Vec3 eye, Vec3 target, double radius) {
         Vec3 f = target.subtract(eye).multiply(1, 0, 1).normalize();
         Vec3 right = new Vec3(-f.z, 0, f.x);
-        return target.subtract(right.scale(radius * 0.36));
+        return target.subtract(right.scale(radius * 0.84));
     }
 
     private static Vec3 orbitEye(Vec3 center, double radius, double degrees, double height) {
@@ -516,12 +718,11 @@ public class TrailerTest implements FabricClientGameTest {
                 c.setConfig(c.config().withExtents(new Extents(7, 3, 11, 12, 8, 8)));
         });
         clickOn(core, null, 20);
-        // In the trailer the zone seals at once: no walking out first (in the game it waits for everyone to leave).
-        run(1);
-        server.runOnServer(s -> {
-            if (s.overworld().getBlockEntity(core) instanceof CoreBlockEntity c)
-                c.arm();
-        });
+        run(8);
+        // Off camera: the zone only locks once everyone has left it, so the player steps out (onto the roof of the
+        // hall), waits for the crystal to set, and comes back to the very same spot. No frames are taken meanwhile:
+        // the shot carries on as if nothing happened.
+        leaveUntilArmed(core, hall.offset(6, 14, 9));
         go(at(hall, 6.5, 1 + EYE, 12.6), at(hall, 6.5, 3.0, 9.5), 2.0);
         run(30);
 
@@ -538,6 +739,30 @@ public class TrailerTest implements FabricClientGameTest {
         go(eyeGoal, at(hall, 3.6, 1.0, 10.4), 6.5);
         clickOn(hall.offset(3, 0, 10), Direction.UP, 14);
         run(14);
+    }
+
+    /**
+     * Takes the player out of the zone of {@code core} to {@code outside} without filming, waits until the core has
+     * armed (it waits for everyone to leave), and puts them back exactly where the camera was.
+     */
+    private void leaveUntilArmed(BlockPos core, BlockPos outside) {
+        Vec3 back = eye[2];
+        server.runCommand(String.format(Locale.ROOT, "tp @a %.3f %.3f %.3f", outside.getX() + 0.5, (double) outside.getY(),
+                outside.getZ() + 0.5));
+        boolean armed = false;
+        for (int i = 0; i < 100 && !armed; i++) {
+            ctx.waitTick();
+            armed = server.computeOnServer(s -> s.overworld().getBlockEntity(core) instanceof CoreBlockEntity c
+                    && c.isArmed());
+        }
+        log("hall core armed: " + armed);
+        if (!armed)
+            throw new AssertionError("the hall core did not arm after the player left");
+        server.runCommand(String.format(Locale.ROOT, "tp @a %.3f %.3f %.3f", back.x, back.y - EYE, back.z));
+        ctx.waitTicks(3);
+        apply(true);
+        ctx.waitTicks(2);
+        apply(true);
     }
 
     /** Clicks with the wand {@code moves} times at a person's pace, the eyes following the wall as it moves. */
@@ -590,11 +815,8 @@ public class TrailerTest implements FabricClientGameTest {
         go(at(sanctum, 5.5, 1 + EYE, 7.4), at(sanctum, 5.5, 1.0, 5.5), 4.2);
         run(14);
         hold(true, 10);
-        go(eyeGoal, at(sanctum, 4.5, 1.0, 5.5), 7);
-        run(3);
-        hold(true, 9);
-        go(at(sanctum, 5.0, 1 + EYE, 7.8), at(sanctum, 5.0, 1.6, 4.8), 2.2);
-        run(28);
+        // One block is enough: a second of stillness on the hole, and the scene ends.
+        run(20);
         log("floor after: " + server.computeOnServer(s -> s.overworld().getBlockState(floor).toString()));
     }
 
@@ -616,8 +838,10 @@ public class TrailerTest implements FabricClientGameTest {
         clickOn(bridge.offset(5, 0, 14), Direction.NORTH, 20); // a block over the lava: it ripples
         run(6);
         select(1);
-        go(at(bridge, 4.7, 1 + EYE, 15.9), at(bridge, 3.5, 2.1, 15.5), 5);
-        clickOn(bridge.offset(3, 2, 15), null, 24); // the button
+        // A person's turn to the button, not a snap: slow, settled before the press.
+        go(at(bridge, 4.7, 1 + EYE, 15.9), at(bridge, 3.5, 2.1, 15.5), 2.0);
+        run(30);
+        clickOn(bridge.offset(3, 2, 15), null, 40); // the button
         // The stones rise, nearest first; the lamps follow; the eyes run along the path to the core.
         int stones = 9, lamps = 5;
         for (int t = 0; t < stones * 3 + 14; t++) {
@@ -720,8 +944,8 @@ public class TrailerTest implements FabricClientGameTest {
     }
 
     /**
-     * Mazes: from inside the entrance a hedge won't break; then, flying up from beyond the gate, the wand comes into
-     * the hand and the zone fades in round the whole maze.
+     * Mazes: in through the gate, round the first turn, and the hedge between the path and the middle won't break;
+     * then, flying up from beyond the gate, the wand comes into the hand and the zone fades in round the whole maze.
      */
     private void mazeScene() {
         server.runCommand("clear @a");
@@ -731,14 +955,25 @@ public class TrailerTest implements FabricClientGameTest {
         cut(start, at(maze, 9.5, 2.2, 12.0));
         settle(start);
         mark("maze");
-        // From the gate, a step in; the hedge at the entrance gets the pickaxe: it only ripples.
-        go(at(maze, 9.5, 1 + EYE, 20.4), at(maze, 9.5, 2.0, 13.0), 2.6);
-        run(24);
-        go(eyeGoal, at(maze, 8.6, 2.1, 19.0), 3.4);
+        // In through the gate, two steps up to the first hedge across the path, which turns west. The eyes lead the
+        // body: a glance down the side passage at the first junction, then ahead and already round the coming turn.
+        go(at(maze, 9.5, 1 + EYE, 15.6), at(maze, 8.0, 2.2, 13.0), 1.6);
+        run(18);
+        lookGoal = at(maze, 5.0, 2.3, 17.5);
+        rate = 1.6;
+        run(14);
+        lookGoal = at(maze, 6.0, 2.2, 15.5);
         run(16);
-        hold(true, 22);
-        go(at(maze, 9.5, 1 + EYE, 19.8), at(maze, 9.5, 2.0, 12.0), 3.0);
-        run(22);
+        // A couple of steps along the passage...
+        go(at(maze, 7.6, 1 + EYE, 15.5), at(maze, 4.5, 2.2, 15.2), 1.6);
+        run(14);
+        // ...the eyes drifting to the hedge on the right: why not straight through to the middle? It only ripples.
+        lookGoal = at(maze, 7.5, 2.1, 14.4);
+        rate = 1.8;
+        run(26);
+        hold(true, 26);
+        go(eyeGoal, at(maze, 7.5, 2.6, 12.0), 1.8);
+        run(20);
 
         creative();
         server.runCommand("clear @a");

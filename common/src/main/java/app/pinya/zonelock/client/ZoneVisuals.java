@@ -50,12 +50,14 @@ public final class ZoneVisuals {
     private static final double NEAR_RADIUS = 6.0;
 
     /** Ticks the wand's view of the zones takes to fade in when it is taken in hand, and out when it is put away. */
-    private static final double WAND_FADE = 8.0;
+    private static final float WAND_FADE = 8.0F;
 
     private static @Nullable TutorialToast wandToast;
-    private static boolean wandShown;
-    private static double wandChangedAt = -1e9;
-    private static float wandFrom;
+    /**
+     * How far the wand's view has faded in, last tick and this tick (0..1), stepped by the client's own ticks: never
+     * by the world's clock, which jumps when the player changes worlds.
+     */
+    private static float wandPrev, wandNow;
 
     private ZoneVisuals() {
     }
@@ -131,21 +133,18 @@ public final class ZoneVisuals {
         if (player == null || level == null) {
             ZoneForcefield.setPatches(List.of());
             wandToast(mc, false);
+            wandPrev = wandNow = 0;
             return;
         }
         Vec3 eye = player.getEyePosition();
 
         List<ZoneForcefield.Patch> patches = new ArrayList<>();
         boolean reveal = holding(player, ModItems.WAND.get());
-        long now = level.getGameTime();
-        if (reveal != wandShown) {
-            wandFrom = wandLevel(now);
-            wandChangedAt = now;
-            wandShown = reveal;
-        }
+        wandPrev = wandNow;
+        wandNow = reveal ? Math.min(1, wandNow + 1 / WAND_FADE) : Math.max(0, wandNow - 1 / WAND_FADE);
         // With the wand (and while its view fades out): armed zones show moving runes, switched-off ones still ones,
         // and the wall the wand points at (of a zone that can be reshaped) lights up.
-        if (reveal || wandLevel(now) > 0) {
+        if (reveal || wandNow > 0 || wandPrev > 0) {
             WandTarget target = reveal ? ResonanceWandItem.clientTarget(player, ResonanceWandItem.blockDistance(player))
                     .orElse(null) : null;
             for (Zone zone : ClientZoneCache.INDEX.near(eye, REVEAL_RANGE))
@@ -178,13 +177,12 @@ public final class ZoneVisuals {
     }
 
     /**
-     * How much of the wand's view shows at {@code time} (game ticks, with the partial tick): it eases in over
-     * {@link #WAND_FADE} ticks when the wand is taken in hand and out when it is put away.
+     * How much of the wand's view shows this frame ({@code partialTick} of the way from the last tick to this one): it
+     * eases in over {@link #WAND_FADE} ticks when the wand is taken in hand and out when it is put away.
      */
-    public static float wandLevel(double time) {
-        double k = Math.min(1.0, Math.max(0.0, (time - wandChangedAt) / WAND_FADE));
-        k = k * k * (3 - 2 * k);
-        return (float) (wandFrom + ((wandShown ? 1.0F : 0.0F) - wandFrom) * k);
+    public static float wandLevel(float partialTick) {
+        float k = wandPrev + (wandNow - wandPrev) * partialTick;
+        return k * k * (3 - 2 * k);
     }
 
     // ------------------------------------------------------------------ helpers

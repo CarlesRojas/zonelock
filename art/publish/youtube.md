@@ -18,7 +18,7 @@ Links (Customization > Basic info > Links):
 
 - Source code: https://github.com/CarlesRojas/zonelock
 - CurseForge: https://www.curseforge.com/minecraft/mc-mods/zonelock
-- Modrinth: https://modrinth.com/mod/zonelock (once the project exists)
+- Modrinth: https://modrinth.com/mod/zonelock
 
 Contact email: zonelock@teampinya.com
 
@@ -62,3 +62,5 @@ minecraft, minecraft mod, zone lock, dungeon, adventure map, map making, fabric,
 ```
 
 Settings: category Gaming, game title Minecraft, not made for kids, thumbnail `art/logo/zonelock_thumbnail.png`.
+
+Trailer: https://youtu.be/W94lSa-9igw

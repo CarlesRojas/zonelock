@@ -624,23 +624,16 @@ def bridge():
 
 # ---------------------------------------------------------------------------------------------- the hedge maze
 
-def maze():
-    CELLS = 9
-    N = CELLS * 2 + 1      # 19 x 19 grid of hedge or path
-    PAD = 3                # lawn and garden wall round it
-    SIZE = N + PAD * 2
-    DEPTH = 5              # foundation under the lawn
-    UP = 9
-    s = Set("maze", SIZE, DEPTH + UP, SIZE, (PAD, DEPTH, PAD))
-    rng = random.Random(7)
-    grid = [[1] * N for _ in range(N)]
+def _carve(cells, n, seed):
+    rng = random.Random(seed)
+    grid = [[1] * n for _ in range(n)]
     stack = [(0, 0)]
     seen = {(0, 0)}
     grid[1][1] = 0
     while stack:
         cx, cz = stack[-1]
         nbrs = [(cx + dx, cz + dz) for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1))
-                if 0 <= cx + dx < CELLS and 0 <= cz + dz < CELLS and (cx + dx, cz + dz) not in seen]
+                if 0 <= cx + dx < cells and 0 <= cz + dz < cells and (cx + dx, cz + dz) not in seen]
         if not nbrs:
             stack.pop()
             continue
@@ -649,15 +642,58 @@ def maze():
         grid[nz * 2 + 1][nx * 2 + 1] = 0
         seen.add((nx, nz))
         stack.append((nx, nz))
-    # A 3x3 clearing in the middle for the core, the entrance in the south, a few extra loops.
+    return grid, rng
+
+
+def _path_length(grid, n, start, goal):
+    from collections import deque
+    dist = {start: 0}
+    queue = deque([start])
+    while queue:
+        x, z = queue.popleft()
+        if (x, z) == goal:
+            return dist[(x, z)]
+        for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            p = (x + dx, z + dz)
+            if 0 <= p[0] < n and 0 <= p[1] < n and not grid[p[1]][p[0]] and p not in dist:
+                dist[p] = dist[(x, z)] + 1
+                queue.append(p)
+    return None
+
+
+def maze_grid(cells, n, mid):
+    """A perfect maze (one way through, no loops) whose entrance in the south goes two steps in, meets a hedge and
+    turns west, with the hedge north of the next cell standing between the player and the middle (what the trailer
+    tries to cut through), and a long walk from the gate to the core."""
+    for seed in range(1, 5000):
+        grid, rng = _carve(cells, n, seed)
+        for dz in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                grid[mid + dz][mid + dx] = 0
+        grid[n - 1][mid] = 0
+        e = n - 4                                  # the first cell row inside (grid z), two blocks in from the edge
+        if not (grid[n - 2][mid] == 0 and grid[n - 3][mid] == 0 and grid[e][mid] == 0):
+            continue
+        if not (grid[e - 1][mid] == 1 and grid[e][mid - 1] == 0 and grid[e][mid - 2] == 0 and grid[e - 1][mid - 2] == 1):
+            continue
+        length = _path_length(grid, n, (mid, n - 1), (mid, mid))
+        if length is None or length < 70:
+            continue
+        print(f"maze seed {seed}: {length} steps from the gate to the core")
+        return grid, rng
+    raise RuntimeError("no maze fits")
+
+
+def maze():
+    CELLS = 9
+    N = CELLS * 2 + 1      # 19 x 19 grid of hedge or path
+    PAD = 3                # lawn and garden wall round it
+    SIZE = N + PAD * 2
+    DEPTH = 5              # foundation under the lawn
+    UP = 9
+    s = Set("maze", SIZE, DEPTH + UP, SIZE, (PAD, DEPTH, PAD))
     mid = N // 2
-    for dz in (-1, 0, 1):
-        for dx in (-1, 0, 1):
-            grid[mid + dz][mid + dx] = 0
-    grid[N - 1][mid] = 0
-    grid[N - 2][mid] = 0
-    for (z, x) in ((4, 7), (10, 13), (14, 5), (7, 12)):
-        grid[z][x] = 0
+    grid, rng = maze_grid(CELLS, N, mid)
     hedge = tex("oak_leaves[distance=7,persistent=true,waterlogged=false]",
                 ("flowering_azalea_leaves[distance=7,persistent=true,waterlogged=false]", 0.12),
                 ("azalea_leaves[distance=7,persistent=true,waterlogged=false]", 0.25))

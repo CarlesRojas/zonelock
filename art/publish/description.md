@@ -4,7 +4,7 @@
 
 Seal an area with an **Amethyst Core** and nothing inside it can be broken, built or skipped until the challenge is beaten: no digging straight to the end, no towering over the walls, no ender pearls past the puzzle. Reach the core, switch it off, and the place is yours.
 
-{{TRAILER}}
+<iframe width="800" height="450" src="https://www.youtube-nocookie.com/embed/W94lSa-9igw" title="Zone Lock trailer" frameborder="0" allowfullscreen></iframe>
 
 **Fabric and NeoForge · Minecraft 26.3 · Everything craftable in survival · Works in multiplayer**
 
