@@ -17,7 +17,11 @@ Fabric and NeoForge · Minecraft 26.3 · Everything craftable in survival
 2. Shape the zone in the world with a **Resonance Wand**: point at a wall of the switched-off zone; use pushes it
    away from you, sneak + use pulls it towards you (from inside that grows the zone, from outside it shrinks it).
    Zones never cross: a wall stops against another zone, and a core can't be placed inside one.
-3. Place an **amethyst shard** on top: the crystal rises and the zone is sealed.
+3. Place an **amethyst shard** on top: the crystal rises, and the zone seals **as soon as everyone has left it**
+   (and nobody near it holds a wand). Until then it stays as it was: you can still edit it, the seals don't react and
+   every door wired to them stays open, so you can always walk out, set the puzzle to its starting state on the way
+   (a lever back down, a door you broke to get out put back with the wand in hand) and leave. Sneak + use on the core
+   takes the shard back.
 4. To open it, someone has to beat the core's challenge. Its crystal shatters and the zone is free.
 
 There are two cores. The Amethyst Core is crafted; adding redstone turns it into a Redstone Core. Every core needs
@@ -31,6 +35,14 @@ the seals of its zone put out first; the core then decides what comes last:
 **An armed core is a challenge for everyone, whoever armed it included**: nothing about it or its seals can be changed
 until it is beaten (creative map makers excepted). A beaten core keeps its configuration and is anyone's to set up
 again; placing a shard on it restarts the challenge: every seal burns again.
+
+A bed or respawn anchor inside a sealed zone doesn't bring you back there: you respawn at the world spawn, so dying is
+always a way out of a dungeon and never a way back into a room you were stuck in.
+
+**Seals and cores give a redstone signal** (strength 15, like a redstone block) whenever they aren't holding anything
+shut: a seal once it is put out, a core once it is switched off, and both while the zone isn't armed. Wire a door to a
+seal and it stands open while you build, shuts when the core is armed, and opens when a challenger puts that seal out,
+so one room can lead to the next. Wire the treasure room to the core and it opens when the dungeon is beaten.
 
 ## What a sealed zone blocks
 

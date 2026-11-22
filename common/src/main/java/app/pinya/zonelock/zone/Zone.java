@@ -14,11 +14,12 @@ import net.minecraft.network.codec.StreamCodec;
 /**
  * A protected area. Immutable snapshot, shared by the server index and the client mirror.
  *
- * @param anchor the position of the core whose zone it is
- * @param rules  bit mask of {@link Rule}s
+ * @param anchor  the position of the core whose zone it is
+ * @param rules   bit mask of {@link Rule}s
+ * @param pending a shard sits on the core, but the zone waits for everyone to leave before it locks
  */
 public record Zone(UUID id, BlockPos anchor, ZoneBox box, boolean active, String name, int rules,
-        LockInfo lock) {
+        LockInfo lock, boolean pending) {
 
     public static final Codec<Zone> CODEC = RecordCodecBuilder.create(i -> i.group(
             UUIDUtil.CODEC.fieldOf("id").forGetter(Zone::id),
@@ -27,7 +28,8 @@ public record Zone(UUID id, BlockPos anchor, ZoneBox box, boolean active, String
             Codec.BOOL.fieldOf("active").forGetter(Zone::active),
             Codec.STRING.optionalFieldOf("name", "").forGetter(Zone::name),
             Codec.INT.fieldOf("rules").forGetter(Zone::rules),
-            LockInfo.CODEC.optionalFieldOf("lock", LockInfo.NONE).forGetter(Zone::lock))
+            LockInfo.CODEC.optionalFieldOf("lock", LockInfo.NONE).forGetter(Zone::lock),
+            Codec.BOOL.optionalFieldOf("pending", false).forGetter(Zone::pending))
             .apply(i, Zone::new));
 
     public static final StreamCodec<ByteBuf, Zone> STREAM_CODEC = new StreamCodec<>() {
@@ -40,7 +42,8 @@ public record Zone(UUID id, BlockPos anchor, ZoneBox box, boolean active, String
             String name = ByteBufCodecs.stringUtf8(64).decode(buf);
             int rules = ByteBufCodecs.VAR_INT.decode(buf);
             LockInfo lock = LockInfo.STREAM_CODEC.decode(buf);
-            return new Zone(id, anchor, box, active, name, rules, lock);
+            boolean pending = buf.readBoolean();
+            return new Zone(id, anchor, box, active, name, rules, lock, pending);
         }
 
         @Override
@@ -52,6 +55,7 @@ public record Zone(UUID id, BlockPos anchor, ZoneBox box, boolean active, String
             ByteBufCodecs.stringUtf8(64).encode(buf, zone.name);
             ByteBufCodecs.VAR_INT.encode(buf, zone.rules);
             LockInfo.STREAM_CODEC.encode(buf, zone.lock);
+            buf.writeBoolean(zone.pending);
         }
     };
 
@@ -64,10 +68,10 @@ public record Zone(UUID id, BlockPos anchor, ZoneBox box, boolean active, String
     }
 
     public Zone withActive(boolean value) {
-        return new Zone(id, anchor, box, value, name, rules, lock);
+        return new Zone(id, anchor, box, value, name, rules, lock, pending);
     }
 
     public Zone withLock(LockInfo value) {
-        return new Zone(id, anchor, box, active, name, rules, value);
+        return new Zone(id, anchor, box, active, name, rules, value, pending);
     }
 }

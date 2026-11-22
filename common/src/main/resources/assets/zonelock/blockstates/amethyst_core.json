@@ -2,7 +2,14 @@
   "multipart": [
     {
       "when": {
-        "armed": "true"
+        "OR": [
+          {
+            "armed": "true"
+          },
+          {
+            "pending": "true"
+          }
+        ]
       },
       "apply": {
         "model": "zonelock:block/amethyst_core_armed"
@@ -10,7 +17,8 @@
     },
     {
       "when": {
-        "armed": "false"
+        "armed": "false",
+        "pending": "false"
       },
       "apply": {
         "model": "zonelock:block/amethyst_core_unarmed"

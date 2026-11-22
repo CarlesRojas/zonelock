@@ -43,7 +43,7 @@ public final class ZoneHud {
         Zone found = null;
         List<Zone> here = ClientZoneCache.INDEX.at(player.blockPosition());
         for (Zone zone : here) {
-            if (!zone.active())
+            if (!zone.active() && !zone.pending())
                 continue;
             found = zone;
             break;
@@ -158,6 +158,8 @@ public final class ZoneHud {
     }
 
     private static Component goal(Zone zone) {
+        if (zone.pending())
+            return Component.translatable("hud.zonelock.goal.pending");
         LockInfo lock = zone.lock();
         if (lock.seals() && lock.sealsLit() > 0)
             return Component.translatable("hud.zonelock.goal.seals", lock.sealsTotal() - lock.sealsLit(), lock.sealsTotal());

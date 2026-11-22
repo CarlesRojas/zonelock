@@ -170,6 +170,9 @@ public class ZoneLockClientGameTest implements FabricClientGameTest {
             }
             ctx.takeScreenshot("zonelock_08c_crystal_dormant");
             check(server.computeOnServer(s -> !core(s.overworld()).isArmed()), "core should be unlocked");
+            // Seals and cores give a signal whenever they aren't holding anything shut: the block beside each is powered.
+            check(powered(server, TOUCH_SEAL.east()), "a seal put out should give a signal");
+            check(powered(server, CORE.north()), "a switched-off core should give a signal");
 
             // The wand on the switched-off zone: from inside, looking at its south wall, use pushes it away (grows the
             // zone), sneak + use pulls it back; past what the focus allows it doesn't move.
@@ -230,6 +233,13 @@ public class ZoneLockClientGameTest implements FabricClientGameTest {
             ctx.waitTicks(3);
             server.runOnServer(s -> core(s.overworld()).placeCrystal(player(s),
                     new ItemStack(net.minecraft.world.item.Items.AMETHYST_SHARD)));
+            ctx.waitTicks(10);
+            // Placed from inside, it waits for everyone (and any wand nearby) to be gone before it locks.
+            check(server.computeOnServer(s -> core(s.overworld()).isPending() && !core(s.overworld()).isArmed()),
+                    "a shard placed from inside should wait for the builder to leave");
+            server.runCommand("item replace entity @a weapon.mainhand with minecraft:air");
+            server.runCommand("setblock 0 199 -15 minecraft:stone_bricks");
+            server.runCommand("tp @a 0.5 200 -14.5 0 25");
             for (int frame = 0; frame < 20; frame++) {
                 ctx.takeScreenshot(String.format("clip_rearm_%02d", frame));
                 ctx.waitTicks(2);
@@ -237,10 +247,14 @@ public class ZoneLockClientGameTest implements FabricClientGameTest {
             check(server.computeOnServer(s -> core(s.overworld()).isArmed()), "a shard should arm the core again");
             check(server.computeOnServer(s -> s.overworld().getBlockState(TOUCH_SEAL).getValue(SealBlock.LIT)),
                     "arming should relight the seals");
+            ctx.waitTicks(6);
+            check(!powered(server, TOUCH_SEAL.east()), "a lit seal of an armed zone should give no signal");
+            check(!powered(server, CORE.north()), "an armed core should give no signal");
             ctx.takeScreenshot("zonelock_08d_rearmed");
             server.runOnServer(s -> core(s.overworld()).disarm());
             server.runCommand("gamemode survival @a");
             ctx.waitTicks(10);
+            check(powered(server, TOUCH_SEAL.east()), "a lit seal of a switched-off zone should give a signal");
 
             // The three cores side by side.
             server.runCommand("setblock -4 200 7 zonelock:amethyst_core[facing=south]");
@@ -393,6 +407,11 @@ public class ZoneLockClientGameTest implements FabricClientGameTest {
 
     private static ServerPlayer player(net.minecraft.server.MinecraftServer server) {
         return server.getPlayerList().getPlayers().getFirst();
+    }
+
+    /** Whether a redstone signal reaches {@code pos} from any side. */
+    private static boolean powered(TestServerContext server, BlockPos pos) {
+        return server.computeOnServer(s -> s.overworld().hasNeighborSignal(pos));
     }
 
     private static void check(boolean condition, String message) {

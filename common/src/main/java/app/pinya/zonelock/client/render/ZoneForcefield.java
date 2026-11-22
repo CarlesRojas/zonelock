@@ -88,7 +88,15 @@ public final class ZoneForcefield {
         if (current.isEmpty())
             return;
         Vec3 cam = state.cameraRenderState.pos;
-        List<Patch> drawn = new ArrayList<>(current);
+        // The wand's whole walls ease in and out; the patches near the player give way to them meanwhile.
+        float wand = app.pinya.zonelock.client.ZoneVisuals.wandLevel(now);
+        List<Patch> drawn = new ArrayList<>();
+        for (Patch patch : current) {
+            float k = patch.radius() == 0 ? wand : 1 - wand;
+            if (k > 0.004F)
+                drawn.add(new Patch(patch.box(), patch.focus(), patch.strength() * k, patch.outset(), patch.armed(),
+                        patch.lit(), patch.radius()));
+        }
         pose.pushPose();
         pose.translate(-cam.x, -cam.y, -cam.z);
         // Far walls first: each wall writes depth, so one drawn before a wall behind it would hide that one.

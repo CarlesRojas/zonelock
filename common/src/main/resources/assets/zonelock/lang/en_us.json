@@ -82,5 +82,9 @@
   "gui.zonelock.tier.3": "Emerald or amethyst block · %s blocks per side",
   "gui.zonelock.tier.4": "Diamond block · %s blocks per side",
   "gui.zonelock.tier.5": "Netherite block · %s blocks per side",
-  "gui.zonelock.reach_title": "Reach per side"
+  "gui.zonelock.reach_title": "Reach per side",
+  "hud.zonelock.goal.pending": "Leave the zone to lock it",
+  "message.zonelock.pending": "%s will lock once everyone has left it",
+  "message.zonelock.pending_wand": "Put the wand away to lock %s",
+  "message.zonelock.pending_cancelled": "The crystal comes off: %s stays open"
 }
